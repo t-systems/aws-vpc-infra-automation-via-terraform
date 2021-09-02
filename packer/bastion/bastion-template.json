@@ -1,0 +1,42 @@
+{
+    "variables" : {
+        "region" : "us-east-1",
+        "source_ami" : "ami-02354e95b39ca8dec",
+        "ami_name": "bastion-host-{{isotime `2006-01-02`}}"
+    },
+    "builders" : [
+        {
+            "type" : "amazon-ebs",
+            "profile" : "test-admin",
+            "region" : "{{user `region`}}",
+            "instance_type" : "t3a.micro",
+            "source_ami" : "{{user `source_ami`}}",
+            "ssh_username" : "ec2-user",
+            "ami_name" : "{{user `ami_name`}}",
+            "ami_description" : "Amazon Linux Image with Telegraf",
+            "run_tags" : {
+                "Name" : "packer-builder-bastion",
+                "Project": "Learning-TF"
+            },
+            "tags" : {
+                "CreationDate": "{{isotime `2006-01-02`}}",
+                "Tool" : "Packer",
+                "Author" : "Vivek",
+                "Name": "Bastion-AMI",
+                "Project": "Learning-TF"
+            }
+        }
+    ],
+    "provisioners" : [
+        {
+            "type" : "file",
+            "source" : "./telegraf.conf",
+            "destination" : "/tmp/telegraf.conf"
+        },
+        {
+            "type" : "shell",
+            "script" : "./setup.sh",
+            "execute_command" : "sudo -E -S sh '{{ .Path }}'"
+        }
+    ]
+}
