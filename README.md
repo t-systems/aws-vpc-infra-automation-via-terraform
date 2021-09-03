@@ -27,6 +27,7 @@
 
 <details>
     <summary>AWS VPC Architecture</summary>
+    
 ## About The Project
 * [VPC Module Link](/aws-tf-modules/module.vpc)
 * [VPC Endpoint Module Link](/aws-tf-modules/module.vpc-endpoints)
