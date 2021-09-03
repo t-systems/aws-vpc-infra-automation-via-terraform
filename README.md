@@ -33,7 +33,7 @@
 * [VPC Module Link](/aws-tf-modules/module.vpc)
 * [VPC Endpoint Module Link](/aws-tf-modules/module.vpc-endpoints)
 
-![VPC Automation via Terraform Modules][product-screenshot]
+![VPC Automation via Terraform Modules][vpc-screenshot]
 
 This project will provision a VPC with basic components as follows:
 * VPC
@@ -43,6 +43,25 @@ This project will provision a VPC with basic components as follows:
 * Route Tables
 * VPC Endpoints (S3, EC2, ECR, CloudWatch)
 * Bastion Host for SSH connection
+
+</details>
+
+***
+
+<details>
+    <summary>AWS EC2 ECS Architecture</summary>
+    
+## About The Project
+* [ECS Module Link](/aws-tf-modules/module.ec2-ecs-cluster)
+
+![VPC Automation via Terraform Modules][ecs-screenshot]
+
+This project will provision ECS cluster in private subnet and uses VPC endpoints for communication:
+* EC2 ECS Cluster
+* Security Groups
+* Launch Template & Autoscaling Group
+* Elastic LoadBalancer (Application)
+* IAM role for ECS 
 
 </details>
 
@@ -127,4 +146,5 @@ Vivek Mishra - [@linkedin](https://www.linkedin.com/in/vivek-mishra-22aa44bb55cc
 
 
 <!-- MARKDOWN LINKS & IMAGES -->
-[product-screenshot]: AWS-VPC.svg
+[vpc-screenshot]: images/AWS-VPC.svg
+[ecs-screenshot]: images/AWS-ECS-Cluster.svg
