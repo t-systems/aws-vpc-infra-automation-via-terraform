@@ -1,0 +1,37 @@
+{
+  "variables": {
+    "region": "us-east-1",
+    "source_ami": "ami-01453e60fc2aef31b",
+    "ami_name": "ecs-ami-{{isotime `2006-01-02`}}"
+  },
+  "builders": [
+    {
+      "type": "amazon-ebs",
+      "profile": "eks-admin",
+      "region": "{{user `region`}}",
+      "instance_type": "t3a.small",
+      "source_ami": "{{user `source_ami`}}",
+      "ssh_username": "ec2-user",
+      "ami_name": "{{user `ami_name`}}",
+      "ami_description": "Amazon Linux Image For EC2-ECS cluster",
+      "run_tags": {
+        "Name": "packer-builder",
+        "Project": "Learning-TF"
+      },
+      "tags": {
+        "CreationDate": "{{isotime `2006-01-02`}}",
+        "Tool": "Packer",
+        "Name": "ECS-AMI",
+        "Author": "Vivek",
+        "Project": "Learning-AWS"
+      }
+    }
+  ],
+  "provisioners": [
+    {
+      "type" : "shell",
+      "script" : "./setup-config.sh",
+      "execute_command" : "sudo -E -S sh '{{ .Path }}'"
+    }
+  ]
+}

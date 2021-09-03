@@ -7,6 +7,6 @@ data "aws_ami" "bastion" {
 
   filter {
     name   = "name"
-    values = ["bastion-host"]
+    values = ["bastion-host-*"]
   }
 }
