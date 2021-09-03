@@ -22,7 +22,7 @@
 </details>
 
 
-
+<details open="open">
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
@@ -134,8 +134,7 @@ To run the terraform deployment from local we should have below installation in 
     ```
         profile = "aws-admin"   # You can parametrize this value as well
     ```
-
-
+</details>
 
 <!-- CONTACT -->
 ## Contact
