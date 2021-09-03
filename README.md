@@ -23,6 +23,8 @@
 
 
 <details open="open">
+   <summary>AWS VPC TF Module Content</summary>
+   
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
@@ -37,7 +39,7 @@ This project will provision a VPC with basic components as follows:
 * VPC Endpoints (S3, EC2, ECR, CloudWatch)
 * Bastion Host for SSH connection
 
-
+</details>
 
 ### Built With
 
@@ -134,7 +136,7 @@ To run the terraform deployment from local we should have below installation in 
     ```
         profile = "aws-admin"   # You can parametrize this value as well
     ```
-</details>
+  
 
 <!-- CONTACT -->
 ## Contact
