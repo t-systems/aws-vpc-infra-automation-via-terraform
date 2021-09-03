@@ -56,55 +56,28 @@ Used below tools:
 ### Prerequisites
 To run the terraform deployment from local we should have below installation in our local machine
 * Terraform 
- ```
-  https://releases.hashicorp.com/terraform/0.13.5/terraform_0.13.5_linux_amd64.zip
-  https://learn.hashicorp.com/tutorials/terraform/install-cli
- ```
+    - [Terraform Executable](https://releases.hashicorp.com/terraform/0.13.5/terraform_0.13.5_linux_amd64.zip)
+    - [Terraform Installation Doc.](https://learn.hashicorp.com/tutorials/terraform/install-cli)
+
 * Install AWS Cli V2 
- ```
-  https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html
- ```
+    - [AWS CLI Installation Doc.](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html)
+
 * Install Packer
- ```
-  https://releases.hashicorp.com/packer/packer_1.7.4
- ```
+    - [Packer Executable](https://releases.hashicorp.com/packer/packer_1.7.4)
+
    
 
 ### Setup Configuration
 
-* Create AWS IAM Role with permission to create resources(Name: XXXX). Trust relationship should be AWS Account & EC2 service. Configure the session duration as per the requirement.
-  ```
-    {
-        "Version": "2012-10-17",
-        "Statement": [
-            {
-                "Effect": "Allow",
-                "Action": "*",
-                "Resource": "*"
-            }
-        ]
-    }
-  ```
-* Create AWS IAM User with permission to assume the role created in above step.
-  ```
-    {
-        "Version": "2012-10-17",
-        "Statement": [
-            {
-                "Effect": "Allow",
-                "Action": "sts:AssumeRole",
-                "Resource": "arn:aws:iam::AWS_ACCOUNT_ID:role/XXXX"
-            }
-        ]
-    }
-    ```
+* Configure IAM credentials for AWS access.
+  
 * Create bastion host AMI using packer
 ```
     cd packer/
     packer validate bastion-template.json    
     packer build bastion-template.json
 ```
-* Generate temporary credentials using below script
+* User can use below script to generate temporary credentials (Optional)
     ```sh
   #!/bin/bash
   
@@ -116,7 +89,7 @@ To run the terraform deployment from local we should have below installation in 
        --role-session-name TF-Session \
        --duration-seconds $token_duration \
        --query 'Credentials.[AccessKeyId,SecretAccessKey,SessionToken]' \
-       --output text --profile PROFILE_NAME)
+       --output text --profile <PROFILE_NAME_IN_AWS_CREDENTIAL_FILE>)
   
   AWS_KEY=$(echo $STS | awk '{print $1}')
   AWS_SECRET=$(echo $STS | awk '{print $2}')
@@ -127,16 +100,8 @@ To run the terraform deployment from local we should have below installation in 
   aws configure set profile.aws-admin.aws_session_token $AWS_TOKEN
   aws configure set profile.aws-admin.region $AWS_REGION
   ```
-* Now copy the generated credentials from your local machine and create 3 secrets in GitHub.
-    ```
-        AWS_ACCESS_KEY=
-        AWS_SECRET_ACCESS_KEY=
-        AWS_SESSION_TOKEN=
-    ``` 
-* You can also use the `aws-admin` profile created above to run the deployment from your local machine. Add below line in TF providers file.
-    ```
-        profile = "aws-admin"   # You can parametrize this value as well
-    ```
+* If you are using any CI tool [GitLab pipelines, GitHub Action, Jenkins], then configure the aws credentials. In this example I am using GitHub Actions. 
+
   
 
 <!-- CONTACT -->
