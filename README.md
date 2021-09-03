@@ -128,7 +128,7 @@ To run the terraform deployment from local we should have below installation in 
 <!-- CONTACT -->
 ## Contact
 
-Vivek Mishra - [@linkedin](https://www.linkedin.com/in/vivek-mishra-22aa44bb55cc/) - vivekkmishra2020@example.com
+Vivek Mishra - [@linkedin](https://www.linkedin.com/in/vivek-mishra-22aa44bb55cc/) - vivekkmishra2020@gmail.com
 
 
 ## My github statistics 🚀
