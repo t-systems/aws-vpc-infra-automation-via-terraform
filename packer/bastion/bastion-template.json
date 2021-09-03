@@ -7,7 +7,7 @@
     "builders" : [
         {
             "type" : "amazon-ebs",
-            "profile" : "test-admin",
+            "profile" : "default",
             "region" : "{{user `region`}}",
             "instance_type" : "t3a.micro",
             "source_ami" : "{{user `source_ami`}}",
