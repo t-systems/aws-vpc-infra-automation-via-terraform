@@ -43,6 +43,7 @@ This project will provision a VPC with basic components as follows:
 
 Used below tools:
 * [Terraform](https://www.terraform.io/)
+* [Packer](https://www.packerio/)
 
 
 
