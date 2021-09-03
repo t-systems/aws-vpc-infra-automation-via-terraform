@@ -22,11 +22,12 @@
 </details>
 
 
-<details open="open">
-   <summary>AWS VPC TF Module Content</summary>
    
 <!-- ABOUT THE PROJECT -->
+
 ## About The Project
+* [VPC Module Link](/aws-tf-modules/module.vpc)
+* [VPC Endpoint Module Link](/aws-tf-modules/module.vpc-endpoints)
 
 ![VPC Automation via Terraform Modules][product-screenshot]
 
@@ -39,7 +40,7 @@ This project will provision a VPC with basic components as follows:
 * VPC Endpoints (S3, EC2, ECR, CloudWatch)
 * Bastion Host for SSH connection
 
-</details>
+
 
 ### Built With
 
