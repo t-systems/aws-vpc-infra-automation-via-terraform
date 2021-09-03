@@ -13,15 +13,10 @@
       <a href="#getting-started">Getting Started</a>
       <ul>
         <li><a href="#prerequisites">Prerequisites</a></li>
-        <li><a href="#installation">Installation</a></li>
+        <li><a href="#Local & GitHub Configuration">Configuration</a></li>
       </ul>
     </li>
-    <li><a href="#usage">Usage</a></li>
-    <li><a href="#roadmap">Roadmap</a></li>
-    <li><a href="#contributing">Contributing</a></li>
-    <li><a href="#license">License</a></li>
     <li><a href="#contact">Contact</a></li>
-    <li><a href="#acknowledgements">Acknowledgements</a></li>
   </ol>
 </details>
 
@@ -53,6 +48,7 @@ Used below tools:
 <!-- GETTING STARTED -->
 ## Getting Started
 
+### Prerequisites
 To run the terraform deployment from local we should have below installation in our local machine
 * Terraform 
  ```
@@ -65,7 +61,7 @@ To run the terraform deployment from local we should have below installation in 
 ```
    
 
-### Steps to run via GitHub Action
+### Local & GitHub Configuration
 
 * Create AWS IAM Role with permission to create resources(Name: XXXX). Trust relationship should be AWS Account & EC2 service. Configure the session duration as per the requirement.
   ```
