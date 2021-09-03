@@ -25,6 +25,8 @@
    
 <!-- ABOUT THE PROJECT -->
 
+<details>
+    <summary>AWS VPC Architecture</summary>
 ## About The Project
 * [VPC Module Link](/aws-tf-modules/module.vpc)
 * [VPC Endpoint Module Link](/aws-tf-modules/module.vpc-endpoints)
@@ -40,7 +42,9 @@ This project will provision a VPC with basic components as follows:
 * VPC Endpoints (S3, EC2, ECR, CloudWatch)
 * Bastion Host for SSH connection
 
+<details>
 
+***
 
 ### Built With
 
