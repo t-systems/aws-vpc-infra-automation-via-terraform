@@ -59,7 +59,11 @@ To run the terraform deployment from local we should have below installation in 
 * Install AWS Cli V2 
  ```
   https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html
-```
+ ```
+* Install Packer
+ ```
+  https://releases.hashicorp.com/packer/packer_1.7.4
+ ```
    
 
 ### Setup Configuration
@@ -90,6 +94,12 @@ To run the terraform deployment from local we should have below installation in 
         ]
     }
     ```
+* Create bastion host AMI using packer
+```
+    cd packer/
+    packer validate bastion-template.json    
+    packer build bastion-template.json
+```
 * Generate temporary credentials using below script
     ```sh
   #!/bin/bash
