@@ -42,7 +42,7 @@ This project will provision a VPC with basic components as follows:
 * VPC Endpoints (S3, EC2, ECR, CloudWatch)
 * Bastion Host for SSH connection
 
-<details>
+</details>
 
 ***
 
