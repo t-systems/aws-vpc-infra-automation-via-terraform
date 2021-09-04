@@ -1,9 +1,15 @@
 ########################################################
 #    Key pair to be used for different applications    #
 ########################################################
+resource "tls_private_key" "bastion_ssh_data" {
+  algorithm = "RSA"
+}
+
 resource "aws_key_pair" "bastion_key" {
-  public_key = var.public_key
   key_name   = "bastion-key"
+  public_key = var.public_key == "" ? tls_private_key.bastion_ssh_data.public_key_openssh : var.public_key
+
+  tags = merge(local.common_tags, map("Name", "bastion-ssh-key"))
 }
 
 

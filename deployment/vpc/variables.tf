@@ -65,7 +65,6 @@ variable "public_key" {
   description = "key pair value"
   default     = ""
 }
-
 ######################################################
 # Local variables defined                            #
 ######################################################

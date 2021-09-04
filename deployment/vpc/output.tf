@@ -7,7 +7,7 @@ output "private_subnets" {
 }
 
 output "private_cidrs" {
-  value = module.vpc.private_cirds
+  value = module.vpc.private_cidrs
 }
 
 output "public_subnets" {
