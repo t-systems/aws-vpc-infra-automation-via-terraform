@@ -49,7 +49,7 @@ This project will provision a VPC with basic components as follows:
 ***
 
 <details>
-    <summary>AWS EC2 ECS Architecture</summary>
+    <summary>AWS EC2 ECS Architecture Using VPC Endpoints</summary>
     
 ## About The Project
 * [ECS Module Link](/aws-tf-modules/module.ec2-ecs-cluster)

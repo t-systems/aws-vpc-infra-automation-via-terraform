@@ -42,7 +42,7 @@ terraform {
     }
     tls = {
       source = "hashicorp/tls"
-      version = "~> 1.0"
+      version = "~> 3.1.0"
     }
   }
   required_version = ">= 0.13"
