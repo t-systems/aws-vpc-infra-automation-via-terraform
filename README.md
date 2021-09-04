@@ -97,7 +97,7 @@ To run the terraform deployment from local we should have below installation in 
 * Configure IAM credentials for AWS access.
 * Create bastion host AMI using packer
 ```
-    cd packer/
+    cd packer/bastion/
     packer validate bastion-template.json    
     packer build bastion-template.json
 ```
