@@ -28,6 +28,6 @@ db_azs_with_cidr = {
 
 team                  = "LearningTeam"
 owner                 = "Vivek"
-bastion_instance_type = "t3a.small"
 isMonitoring          = true
 project               = "Learning-TF"
+bastion_instance_type = "t3a.small"

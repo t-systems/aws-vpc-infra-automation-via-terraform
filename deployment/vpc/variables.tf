@@ -51,20 +51,12 @@ variable "bastion_instance_type" {
   description = "Instance type for Bastion Host"
 }
 
-#########################################################
-# Default variables for backend and SSH key for Bastion #
-#########################################################
-variable "s3_bucket_prefix" {
-  type        = string
-  default     = "learning-tfstate"
-  description = "Prefix for s3 bucket where we store TF state file"
-}
-
 variable "public_key" {
   type        = string
   description = "key pair value"
   default     = ""
 }
+
 ######################################################
 # Local variables defined                            #
 ######################################################
