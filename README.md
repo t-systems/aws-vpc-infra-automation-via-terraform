@@ -79,7 +79,7 @@ Used below tools:
 ## Getting Started
 
 ### Prerequisites
-To run the terraform deployment from local we should have below installation in our local machine
+To run the terraform deployment from local we should have below installation in our machine
 * Terraform 
     - [Terraform Executable](https://releases.hashicorp.com/terraform/0.13.5/terraform_0.13.5_linux_amd64.zip)
     - [Terraform Installation Doc.](https://learn.hashicorp.com/tutorials/terraform/install-cli)
@@ -90,7 +90,7 @@ To run the terraform deployment from local we should have below installation in 
 * Install Packer
     - [Packer Executable](https://releases.hashicorp.com/packer/packer_1.7.4)
 
-   
+
 
 ### Setup Configuration
 
@@ -103,11 +103,13 @@ To run the terraform deployment from local we should have below installation in 
 ```
 * User can use below script to generate temporary credentials (Optional)
     - [Generate AWS Temporary Credentials](/assume-role-script.sh)
-* Terraform backend configuration using S3 & DynamobDB table (Optional)
+* Terraform backend configuration using S3 & DynamoDB table (Optional)
     - [AWS Resources For TF Backend](aws-terraform-backend)
 * If you are using any CI tool **GitLab pipelines, GitHub Action, Jenkins** then configure the aws credentials accordingly. In this example I am using GitHub Actions to provision AWS resources. 
 
-  
+* Some useful terraform commands
+    - [Terraform commands](terraform-commands)
+
 
 <!-- CONTACT -->
 ## Contact

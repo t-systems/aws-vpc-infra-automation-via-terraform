@@ -1,0 +1,103 @@
+#####================Initialize Terraform with local tfstate=============#####
+terraform init
+
+It’s the first command you need to execute. Unless  terraform plan , apply  ,
+destroy   and import  will not work. The command terraform init will install :
+--Terraform modules
+--Eventually a backend
+--Provider(s) plugins
+
+#####================Init Terraform and Don’t Ask Any Input========#####
+$ terraform init -input=false
+
+#Backend Configuration During the Init if not specified in configuration file
+$ terraform init -backend-config="<BACKEND_CONFIG_FILE_PATH>"
+
+#####===========Plan=================#####
+The plan step check configuration to execute and write a plan to apply to target
+infrastructure provider.
+
+$ terraform plan -out plan.out
+
+It’s an important feature of Terraform that allows a user to see which actions
+Terraform will perform prior to making any changes,
+increasing confidence that a change will have the desired effect once applied.
+
+When you execute terraform plan, Terraform will scan all *.tf files
+in your directory and create the plan.
+
+#####=================Apply Terraform=============#####
+terraform apply -auto-approve
+
+Apply and Define New Variables Value
+$ terraform apply -auto-approve -var tags-repository_url=${GIT_URL}
+
+Apply Only One Module
+$ terraform apply -target=module.s3
+
+
+#####================Destroy===============#####
+$ terraform destroy
+
+Delete all the resources!
+
+#####===========A deletion plan can be created before==============#####
+$ terraform plan –destroy
+
+#####============-target option allows to destroy only one resource, for example, an S3 bucket========#####
+$ terraform destroy -target aws_s3_bucket.my_bucket
+
+
+#####===========Unlock State============#####
+$ terraform force-unlock <UNLOCK-ID>
+
+#####===============Validate======================#####
+The validate command is used to validate/check the syntax of the Terraform files.
+A syntax check is done on all the Terraform files in the directory and will display an
+error if any of the files don’t validate.
+The syntax check does not cover every syntax common issues.
+$ terraform validate
+
+
+#####================Providers===================#####
+You can use a lot of providers/plugins in your Terraform definition resources,
+so it can be useful to have a tree of providers used by modules in your project.
+$ terraform providers
+
+
+#####===========Pull Remote State in A Local Copy=========#####
+$ terraform state pull > terraform.tfstate
+
+
+
+#####============Import Existing Resource in Terraform?==========#####
+If you have an existing resource in your infrastructure provider,
+you can import it in your Terraform state:
+
+$ terraform import aws_iam_policy.elastic_post
+arn:aws:iam::123456789:policy/elastic_post
+
+
+
+#####===================Workspaces================#####
+To manage multiple distinct sets of infrastructure resources/environments.
+Instead of creating a directory for each environment to manage,
+we need to just create needed workspace and use them:
+
+#####=====Create Workspace======#####
+This command creates a new workspace and then select it
+$ terraform workspace new dev
+
+####==========Select a Workspace=============#####
+$ terraform workspace select dev
+
+#####==========List Workspaces==============#####
+$ terraform workspace list
+  default
+* dev
+  preprod
+
+
+#####===============Show Current Workspace==============#####
+$ terraform workspace show
+dev
