@@ -10,7 +10,6 @@ module "vpc-es-cluster" {
 
   log_retention_days = var.log_retention_days
   instance_type      = var.instance_type
-  key_name           = var.key_name
   max_price          = var.max_price
   volume_size        = var.volume_size
 

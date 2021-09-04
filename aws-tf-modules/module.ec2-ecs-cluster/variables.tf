@@ -35,11 +35,6 @@ variable "instance_type" {
   description = "EC2 instance type to be used for provisioning"
 }
 
-variable "key_name" {
-  type        = string
-  description = "EC2 key pair name"
-}
-
 variable "max_price" {
   type        = string
   description = "Spot price for EC2 instance"

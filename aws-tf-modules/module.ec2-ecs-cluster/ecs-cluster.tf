@@ -26,7 +26,7 @@ resource "aws_launch_template" "ecs_cluster_lt" {
 
   image_id      = data.aws_ami.ecs-node-ami.id
   instance_type = var.instance_type
-  key_name      = var.key_name
+  key_name      = data.terraform_remote_state.vpc.outputs.ssh_keypair_name
 
   user_data = base64encode(data.template_file.ec2_user_data.rendered)
 
