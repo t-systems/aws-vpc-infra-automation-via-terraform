@@ -20,7 +20,7 @@ variable "s3_bucket_prefix" {
 ######################################################
 variable "team" {
   type        = string
-  description = "Owner team for this applcation infrastructure"
+  description = "Owner team for this application infrastructure"
 }
 
 variable "owner" {
@@ -30,7 +30,7 @@ variable "owner" {
 
 variable "environment" {
   type        = string
-  description = "Environmet to be used valid values: 'dev', 'qa', 'prod'"
+  description = "Environment to be used valid values: 'dev', 'qa', 'prod'"
 }
 
 variable "isMonitoring" {
