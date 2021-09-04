@@ -6,15 +6,6 @@ variable "default_region" {
   description = "AWS region to deploy resources"
 }
 
-#########################################################
-# Default variables for backend and SSH key for Bastion #
-#########################################################
-variable "s3_bucket_prefix" {
-  type        = string
-  default     = "learning-tfstate"
-  description = "Prefix for s3 bucket where we store TF state file"
-}
-
 ######################################################
 # Local variables defined                            #
 ######################################################
