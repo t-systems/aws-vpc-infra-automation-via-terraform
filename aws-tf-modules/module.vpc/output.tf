@@ -49,3 +49,7 @@ output "vpc_main_rt" {
 output "ec2_ssh_content" {
   value = tls_private_key.bastion_ssh_data.public_key_openssh
 }
+
+output "ssh_keypair_name" {
+  value = aws_key_pair.bastion_key.key_name
+}

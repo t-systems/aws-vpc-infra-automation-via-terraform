@@ -134,11 +134,11 @@ variable "custom_tags" {
   description = "Custom tags to set on the Instances in the ASG"
   type        = map(string)
   default = {
-    owner      = var.owner
+    owner      = "vivek"
     tool       = "Terraform"
-    monitoring = var.isMonitoring
+    monitoring = "true"
     Name       = "Training-ECS-Cluster",
-    Project    = var.project
+    Project    = "Learning-TF"
   }
 }
 

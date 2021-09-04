@@ -31,7 +31,7 @@ module "vpc-es-cluster" {
 
   component_name = var.component_name
 
-  isMonitoring = false
+  isMonitoring = var.isMonitoring
   owner = var.owner
   project = var.project
   team = var.team

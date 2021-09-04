@@ -10,7 +10,7 @@ component_name = "EC2-ECS-Cluster"
 log_retention_days = 3
 
 instance_type                     = "t3a.small"
-key_name                          = "doubledigit-solutions"
+key_name                          = "bastion-key"
 max_price                         = "0.0070"
 volume_size                       = "40"
 default_target_group_port         = 80
