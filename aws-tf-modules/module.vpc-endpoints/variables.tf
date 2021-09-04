@@ -1,6 +1,6 @@
-######################################################################
-# Global variables for VPC, Subnet, Routes and Bastion Host          #
-######################################################################
+###############################
+#    Global variables         #
+###############################
 variable "default_region" {
   type        = string
   description = "AWS region to deploy resources"
