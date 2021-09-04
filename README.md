@@ -125,7 +125,7 @@ To run the terraform deployment from local we should have below installation in 
   aws configure set profile.aws-admin.aws_session_token $AWS_TOKEN
   aws configure set profile.aws-admin.region $AWS_REGION
   ```
-* If you are using any CI tool [GitLab pipelines, GitHub Action, Jenkins], then configure the aws credentials. In this example I am using GitHub Actions. 
+* If you are using any CI tool **GitLab pipelines, GitHub Action, Jenkins** then configure the aws credentials accordingly. In this example I am using GitHub Actions to provision AWS resources. 
 
   
 
