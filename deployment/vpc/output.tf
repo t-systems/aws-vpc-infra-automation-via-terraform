@@ -46,3 +46,7 @@ output "vpc_cidr" {
 output "ec2_ssh_content" {
   value = module.vpc.ec2_ssh_content
 }
+
+output "ssh_keypair_name" {
+  value = module.vpc.ssh_keypair_name
+}
