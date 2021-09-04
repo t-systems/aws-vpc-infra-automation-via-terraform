@@ -2,14 +2,14 @@
 #      Security Group for ECS Instance      #
 #############################################
 resource "aws_security_group" "ecs_instance_sg" {
-  name        = "monitoring-app-sg"
+  name        = "ecs-node-sg"
   description = "Allow traffic from port elb and enable SSH"
   vpc_id      = data.terraform_remote_state.vpc.outputs.vpc_id
 
   lifecycle {
     create_before_destroy = true
   }
-  tags = merge(local.common_tags, map("Name", "monitoring-app-ec2-sg"))
+  tags = merge(local.common_tags, map("Name", "ecs-node-sg"))
 }
 
 resource "aws_security_group_rule" "allow_traffic_from_lb" {

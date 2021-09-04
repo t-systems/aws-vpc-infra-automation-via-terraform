@@ -5,7 +5,7 @@ data "terraform_remote_state" "vpc" {
   backend = "s3"
 
   config = {
-    bucket  = "${var.s3_bucket_prefix}-${var.environment}-${var.default_region}"
+    bucket  = "${var.tfstate_s3_bucket_prefix}-tfstate-${var.default_region}"
     key     = "state/${var.environment}/vpc/terraform.tfstate"
     region  = var.default_region
   }
@@ -18,7 +18,7 @@ data "terraform_remote_state" "vpc-resources" {
   backend = "s3"
 
   config = {
-    bucket  = "${var.s3_bucket_prefix}-${var.environment}-${var.default_region}"
+    bucket  = "${var.tfstate_s3_bucket_prefix}-tfstate-${var.default_region}"
     key     = "state/${var.environment}/vpc-endpoints/terraform.tfstate"
     region  = var.default_region
   }
@@ -33,7 +33,7 @@ data "template_file" "ec2_user_data" {
   template = file("${path.module}/scripts/ec2-user-data-temp.sh")
 
   vars = {
-    health_monitoring_cluster = aws_ecs_cluster.dd_ecs_cluster.name
+    health_monitoring_cluster = aws_ecs_cluster.test_ecs_cluster.name
   }
 }
 
