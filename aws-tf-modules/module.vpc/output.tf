@@ -14,7 +14,7 @@ output "private_subnets" {
   value = aws_subnet.private.*.id
 }
 
-output "private_cirds" {
+output "private_cidrs" {
   value = aws_subnet.private.*.cidr_block
 }
 
@@ -22,7 +22,7 @@ output "db_subnets" {
   value = aws_subnet.db_subnets_private.*.id
 }
 
-output "db_cirds" {
+output "db_cidrs" {
   value = aws_subnet.db_subnets_private.*.cidr_block
 }
 
