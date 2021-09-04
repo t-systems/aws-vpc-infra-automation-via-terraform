@@ -95,7 +95,6 @@ To run the terraform deployment from local we should have below installation in 
 ### Setup Configuration
 
 * Configure IAM credentials for AWS access.
-  
 * Create bastion host AMI using packer
 ```
     cd packer/
@@ -103,28 +102,9 @@ To run the terraform deployment from local we should have below installation in 
     packer build bastion-template.json
 ```
 * User can use below script to generate temporary credentials (Optional)
-    ```sh
-  #!/bin/bash
-  
-  AWS_REGION="us-east-1"
-  token_duration="28800" # 8hrs
-  role_arn='arn:aws:iam::AWS_ACCOUNT_ID:role/XXXX'
-  
-  STS=$(aws sts assume-role --role-arn $role_arn \
-       --role-session-name TF-Session \
-       --duration-seconds $token_duration \
-       --query 'Credentials.[AccessKeyId,SecretAccessKey,SessionToken]' \
-       --output text --profile <PROFILE_NAME_IN_AWS_CREDENTIAL_FILE>)
-  
-  AWS_KEY=$(echo $STS | awk '{print $1}')
-  AWS_SECRET=$(echo $STS | awk '{print $2}')
-  AWS_TOKEN=$(echo $STS | awk '{print $3}')
-  
-  aws configure set profile.aws-admin.aws_access_key_id $AWS_KEY
-  aws configure set profile.aws-admin.aws_secret_access_key $AWS_SECRET
-  aws configure set profile.aws-admin.aws_session_token $AWS_TOKEN
-  aws configure set profile.aws-admin.region $AWS_REGION
-  ```
+    - [Generate AWS Temporary Credentials](/assume-role-script.sh)
+* Terraform backend configuration using S3 & DynamobDB table (Optional)
+    - [AWS Resources For TF Backend](aws-terraform-backend)
 * If you are using any CI tool **GitLab pipelines, GitHub Action, Jenkins** then configure the aws credentials accordingly. In this example I am using GitHub Actions to provision AWS resources. 
 
   
