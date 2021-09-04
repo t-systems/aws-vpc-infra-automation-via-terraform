@@ -46,3 +46,6 @@ output "vpc_main_rt" {
   value = aws_route_table.vpc_main_rt.id
 }
 
+output "ec2_ssh_content" {
+  value = tls_private_key.bastion_ssh_data.public_key_openssh
+}

@@ -42,3 +42,7 @@ output "bastion_sg" {
 output "vpc_cidr" {
   value = module.vpc.vpc_cidr_block
 }
+
+output "ec2_ssh_content" {
+  value = module.vpc.ec2_ssh_content
+}
