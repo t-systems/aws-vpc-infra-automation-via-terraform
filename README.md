@@ -106,7 +106,9 @@ To run the terraform deployment from local we should have below installation in 
 * Terraform backend configuration using S3 & DynamoDB table (Optional)
     - [AWS Resources For TF Backend](aws-terraform-backend)
 * If you are using any CI tool **GitLab pipelines, GitHub Action, Jenkins** then configure the aws credentials accordingly. In this example I am using GitHub Actions to provision AWS resources. 
-
+    - [VPC Infra Automation](.github/workflows/vpc-infra-pipeline.yml)
+    - [VPC Endpoints Automation](.github/workflows/vpc-endpoints-pipeline.yml)
+    - [EC2 ECS Cluster](.github/workflows/ec2-ecs-cluster-pipeline.yml)
 * Some useful terraform commands
     - [Terraform commands](terraform-commands)
 
