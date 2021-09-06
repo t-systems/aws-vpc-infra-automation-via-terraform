@@ -1,6 +1,5 @@
 {
   "variables": {
-    "region": "us-east-1",
     "source_ami": "ami-01453e60fc2aef31b",
     "ami_name": "ecs-ami-{{isotime `2006-01-02`}}"
   },

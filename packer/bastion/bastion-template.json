@@ -1,6 +1,5 @@
 {
     "variables" : {
-        "region" : "us-east-1",
         "source_ami" : "ami-02354e95b39ca8dec",
         "ami_name": "bastion-host-{{isotime `2006-01-02`}}"
     },
