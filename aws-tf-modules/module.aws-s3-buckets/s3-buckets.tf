@@ -1,6 +1,6 @@
 #####==================Logging Bucket for Test Environment=====================#####
 resource "aws_s3_bucket" "s3_logging_bucket" {
-  bucket = "${var.logging_bucket_prefix}-${var.environment}-${var.default_region}"
+  bucket = "${var.environment}-${var.logging_bucket_prefix}-${var.default_region}"
   acl    = "private"
 
   force_destroy = true
@@ -33,7 +33,7 @@ resource "aws_s3_bucket" "s3_logging_bucket" {
 
 #####==================Artifactory Bucket for Dev Environment=====================#####
 resource "aws_s3_bucket" "s3_artifactory_bucket" {
-  bucket = "${var.artifactory_bucket_prefix}-${var.environment}-${var.default_region}"
+  bucket = "${var.environment}-${var.artifactory_bucket_prefix}-${var.default_region}"
   acl    = "private"
 
   force_destroy = true
@@ -60,13 +60,13 @@ resource "aws_s3_bucket" "s3_artifactory_bucket" {
     }
   }
 
-  tags = merge(local.common_tags, map("Name", "${var.environment}-aritifactory-bucket"))
+  tags = merge(local.common_tags, map("Name", "${var.environment}-artifactory-bucket"))
 }
 
 
 #####==================DataLake S3 Bucket for Dev Environment=====================#####
 resource "aws_s3_bucket" "s3_dataLake_bucket" {
-  bucket = "${var.dataLake_bucket_prefix}-${var.environment}-${var.default_region}"
+  bucket = "${var.environment}-${var.dataLake_bucket_prefix}-${var.default_region}"
   acl    = "private"
 
   force_destroy = true
