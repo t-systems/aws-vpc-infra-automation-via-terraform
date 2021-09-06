@@ -27,7 +27,7 @@ resource "aws_s3_bucket" "s3_logging_bucket" {
     }
   }
 
-  tags = merge(local.common_tags, map("name", "logging-bucket-${var.environment}"))
+  tags = merge(local.common_tags, map("Name", "${var.environment}-logging-bucket"))
 }
 
 
@@ -60,7 +60,7 @@ resource "aws_s3_bucket" "s3_artifactory_bucket" {
     }
   }
 
-  tags = merge(local.common_tags, map("name", "aritifactory-bucket-${var.environment}"))
+  tags = merge(local.common_tags, map("Name", "${var.environment}-aritifactory-bucket"))
 }
 
 
@@ -108,5 +108,5 @@ resource "aws_s3_bucket" "s3_dataLake_bucket" {
     }
   }
 
-  tags = merge(local.common_tags, map("name", "datalake-bucket-${var.environment}"))
+  tags = merge(local.common_tags, map("Name", "${var.environment}-datalake-bucket"))
 }
