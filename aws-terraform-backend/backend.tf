@@ -1,6 +1,6 @@
 #####=====================Terraform tfstate backend S3===================#####
 resource "aws_s3_bucket" "tf_state_backend_bucket" {
-  bucket = "${var.environment}-tfstate-${var.default_region}"
+  bucket = "${var.environment}-tfstate-${data.aws_caller_identity.current.account_id}-${var.default_region}"
   acl    = "private"
 
   force_destroy = false
