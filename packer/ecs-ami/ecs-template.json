@@ -1,6 +1,5 @@
 {
   "variables": {
-    "source_ami": "ami-01453e60fc2aef31b",
     "ami_name": "ecs-ami-{{isotime `2006-01-02`}}"
   },
   "builders": [
@@ -9,7 +8,17 @@
       "profile": "default",
       "region": "{{user `region`}}",
       "instance_type": "t3a.small",
-      "source_ami": "{{user `source_ami`}}",
+      "source_ami_filter": {
+        "filters": {
+          "virtualization-type": "hvm",
+          "name": "amzn-ami-*-amazon-ecs-optimized",
+          "root-device-type": "ebs"
+        },
+        "owners": [
+          "amazon"
+        ],
+        "most_recent": true
+      },
       "ssh_username": "ec2-user",
       "ami_name": "{{user `ami_name`}}",
       "ami_description": "Amazon Linux Image For EC2-ECS cluster",
