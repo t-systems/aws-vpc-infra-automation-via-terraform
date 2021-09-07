@@ -29,6 +29,7 @@ bucket_config = {
     expiry_enabled = true
     expiry_prefix = ""
     expiry_days = 365
+    noncurrent_expiry_days = 30
   },
 
   "logging_bucket" = {
@@ -51,6 +52,7 @@ bucket_config = {
     expiry_enabled = true
     expiry_prefix = ""
     expiry_days = 180
+    noncurrent_expiry_days = 30
   },
 
   "datalake_bucket" = {
