@@ -31,9 +31,7 @@ variable "bucket_config" {
     noncurrent_expiry_days = number
   }))
 
-  description = "S3 bucket configuration to dynamically create multiple buckets.\n "
-                 + " Valid values for 'sse_algorithm' are AES256 and aws:kms \n "
-                  + " Valid values for 'acceleration_status' Enabled or Suspended \n "
+  description = "S3 bucket configuration to dynamically create multiple buckets.\n Valid values for 'sse_algorithm' are AES256 and aws:kms \n Valid values for 'acceleration_status' Enabled or Suspended \n "
 }
 
 ######################################################
