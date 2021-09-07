@@ -13,7 +13,7 @@ read -p "Enter default region: " AWS_REGION
 echo
 read -p "Environment to deploy, valid values 'qa', 'test', 'prod':" ENV
 echo
-read -p "Do you want to deploy TF backend resources? Valid values 'yes' OR 'no':" ENABLE_TF_BACKEND
+read -p "Do you want to deploy TF backend resources? Valid values 'true' OR 'false':" ENABLE_TF_BACKEND
 echo
 
 function terraform_backend_deployment() {
@@ -31,9 +31,9 @@ function terraform_backend_deployment() {
     cd ..
 
     echo ================================ IMPORTANT ===================================================
-    echo "Now update the Bucket Name & DynamoDB table name in the backend-config file for all
-    other modules which you want to deploy. Config file path 'deployment/vpc', 'deployment/vpc-endpoints'
-    , 'deployment/ec2-ecs-cluster'. After updating re-run this script with 'no' for backend resources!"
+    echo "Now update the Bucket Name & DynamoDB table from above TF outputs in the backend-config file for all \n
+    other modules which you want to deploy. Config file paths are 'deployment/vpc', 'deployment/vpc-endpoints', \n
+     'deployment/ec2-ecs-cluster'. After updating re-run this script with 'false' value for backend resources input!"
     echo ================================= ENDS =======================================================
     exit 1
 }
@@ -56,10 +56,8 @@ function s3_bucket_resources_deployment() {
 
 
 function deploy_vpc_network() {
-    echo ============================== Creating AMI using Packer =========================
-
-    echo "First we will create AMI named bastion-host-YYYY-MM-DD using packer \n
-          as it is used in Terraform script"
+    echo ============================== Creating Bastion host AMI using Packer =========================
+    echo "First we will create AMI named bastion-host-YYYY-MM-DD using packer as it is being used in Terraform script"
 
     cd packer/bastion
 
@@ -100,6 +98,16 @@ function deploy_vpc_endpoint_resources() {
 
 
 function deploy_ecs_cluster_resources() {
+    echo ============================== Creating ECS AMI using Packer =========================
+    echo "First we will create AMI named ecs-ami-YYYY-MM-DD using packer as it is being used in Terraform script"
+
+    cd packer/ecs-ami
+
+    packer validate bastion-template.json
+    packer build -var "aws_profile=default" -var "default_region=$AWS_REGION" bastion-template.json
+
+    cd ../..
+
     echo ============================== Starting ECS Cluster Deployment =========================
 
     cd deployment/ec2-ecs-cluster
@@ -116,11 +124,13 @@ function deploy_ecs_cluster_resources() {
 
 
 
-if [ $ENABLE_TF_BACKEND -eq "yes" ]; then
+if [ $ENABLE_TF_BACKEND == "true" ]; then
     terraform_backend_deployment
 fi
 
 s3_bucket_resources_deployment
 deploy_vpc_network
+deploy_vpc_endpoint_resources
+deploy_ecs_cluster_resources
 
 
