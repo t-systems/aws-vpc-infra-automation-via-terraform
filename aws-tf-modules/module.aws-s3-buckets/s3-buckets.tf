@@ -1,112 +1,68 @@
-#####==================Logging Bucket for Test Environment=====================#####
-resource "aws_s3_bucket" "s3_logging_bucket" {
-  bucket = "${var.environment}-${var.logging_bucket_prefix}-${var.default_region}"
-  acl    = "private"
+data "aws_caller_identity" "current" {}
 
-  force_destroy = true
-
-  server_side_encryption_configuration {
-    rule {
-      apply_server_side_encryption_by_default {
-        sse_algorithm = "AES256"
-      }
-    }
-  }
-
-  versioning {
-    enabled = true
-  }
-
-  lifecycle_rule {
-    enabled = true
-    id      = "log"
-    prefix  = "log-data/"
-
-    noncurrent_version_expiration {
-      days = 1
-    }
-  }
-
-  tags = merge(local.common_tags, map("Name", "${var.environment}-logging-bucket"))
+locals {
+  account_id = data.aws_caller_identity.current.account_id
 }
 
+############################################################
+#                     S3 Resources                         #
+############################################################
+resource "aws_s3_bucket" "s3_bucket" {
+  for_each = var.bucket_config
 
-#####==================Artifactory Bucket for Dev Environment=====================#####
-resource "aws_s3_bucket" "s3_artifactory_bucket" {
-  bucket = "${var.environment}-${var.artifactory_bucket_prefix}-${var.default_region}"
-  acl    = "private"
+  bucket = "${var.environment}-${each.value.bucket_prefix}-${local.account_id}-${var.default_region}"
+  acl    = each.value.bucket_acl
 
-  force_destroy = true
+  force_destroy       = each.value.fore_destroy
+  acceleration_status = each.value.acceleration_status
 
   server_side_encryption_configuration {
     rule {
       apply_server_side_encryption_by_default {
-        sse_algorithm = "AES256"
+        sse_algorithm     = each.value.sse_algorithm
+        kms_master_key_id = each.value.kms_master_key_id
       }
     }
   }
 
   versioning {
-    enabled = true
+    enabled = each.value.enable_versioning
   }
 
   lifecycle_rule {
-    enabled = true
-    id      = "deploy"
-    prefix  = "deploy/"
+    id      = "transition-infrequent"
+    enabled = each.value.infrequent_transition_enabled
+    prefix  = each.value.infrequent_transition_prefix
 
-    noncurrent_version_expiration {
-      days = 30
+    transition {
+      days          = each.value.infrequent_transition_days
+      storage_class = "STANDARD_IA"
     }
-  }
-
-  tags = merge(local.common_tags, map("Name", "${var.environment}-artifactory-bucket"))
-}
-
-
-#####==================DataLake S3 Bucket for Dev Environment=====================#####
-resource "aws_s3_bucket" "s3_dataLake_bucket" {
-  bucket = "${var.environment}-${var.dataLake_bucket_prefix}-${var.default_region}"
-  acl    = "private"
-
-  force_destroy = true
-
-
-  server_side_encryption_configuration {
-    rule {
-      apply_server_side_encryption_by_default {
-        sse_algorithm = "AES256"
-      }
-    }
-  }
-
-  versioning {
-    enabled = true
   }
 
   lifecycle_rule {
-    enabled = true
-    id      = "data"
-    prefix  = "data/"
+    id      = "transition-to-glacier"
+    enabled = each.value.glacier_transition_enabled
+    prefix  = each.value.glacier_transition_prefix
 
     transition {
-      days          = 30
-      storage_class = "ONEZONE_IA"            #"STANDARD_IA"
-    }
-
-    transition {
-      days          = 90
+      days          = each.value.glacier_transition_days
       storage_class = "GLACIER"
     }
+  }
 
-    expiration {
-      days = 180
-    }
+  lifecycle_rule {
+    id      = "expiry"
+    enabled = each.value.expiry_enabled
+    prefix  = each.value.expiry_prefix
 
     noncurrent_version_expiration {
-      days = 1
+      days = each.value.noncurrent_expiry_days
+    }
+    expiration {
+      days = each.value.expiry_days
     }
   }
 
-  tags = merge(local.common_tags, map("Name", "${var.environment}-datalake-bucket"))
+  tags = merge(local.common_tags, map("Name", "${var.environment}-${each.value.bucket_prefix}-bucket"))
 }

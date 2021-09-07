@@ -6,25 +6,35 @@ variable "default_region" {
   description = "AWS region to deploy resources"
 }
 
+#####==================================S3 Bucket Configuration Variable============================#####
+variable "bucket_config" {
+  type = map(object({
+    bucket_prefix       = string
+    bucket_acl          = string
+    fore_destroy        = bool
+    acceleration_status = string
+    sse_algorithm       = string
+    kms_master_key_id   = string
+    enable_versioning   = bool
 
-#############################################
-#        Variable for TF resources          #
-#############################################
-variable "artifactory_bucket_prefix" {
-  type        = string
-  description = "S3 bucket store deployment packages"
+    infrequent_transition_enabled = bool
+    infrequent_transition_prefix = string
+    infrequent_transition_days = number
+
+    glacier_transition_enabled = bool
+    glacier_transition_prefix = string
+    glacier_transition_days = number
+
+    expiry_enabled = bool
+    expiry_prefix = string
+    expiry_days = number
+    noncurrent_expiry_days = number
+  }))
+
+  description = "S3 bucket configuration to dynamically create multiple buckets.\n "
+                 + " Valid values for 'sse_algorithm' are AES256 and aws:kms \n "
+                  + " Valid values for 'acceleration_status' Enabled or Suspended \n "
 }
-
-variable "dataLake_bucket_prefix" {
-  type        = string
-  description = "Bucket to store data"
-}
-
-variable "logging_bucket_prefix" {
-  type        = string
-  description = "Bucket to store logging data"
-}
-
 
 ######################################################
 # Local variables defined                            #
