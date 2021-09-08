@@ -95,11 +95,15 @@ To run the terraform deployment from local we should have below installation in 
 ### Setup Configuration
 
 * Configure IAM credentials for AWS access.
-* Create bastion host AMI using packer
+* Create bastion host AMI using packer. Change the region name as per the requirement.
 ```
     cd packer/bastion/
     packer validate bastion-template.json    
-    packer build bastion-template.json
+    packer build -var "aws_profile=<LOCAL_AWS_PROFILE_NAME>" -var "default_region=us-east-1" bastion-template.json
+
+    cd packer/ecs-ami/
+    packer validate ecs-template.json
+    packer build -var "aws_profile=<LOCAL_AWS_PROFILE_NAME>" -var "default_region=us-east-1" ecs-template.json
 ```
 * User can use below script to generate temporary credentials (Optional)
     - [Generate AWS Temporary Credentials](/assume-role-script.sh)
