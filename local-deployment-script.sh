@@ -11,9 +11,9 @@ fi
 
 read -p "Enter default region: " AWS_REGION
 echo
-read -p "Environment to deploy, valid values 'qa', 'test', 'prod':" ENV
+read -p "Environment to deploy, valid values 'qa', 'test', 'prod': " ENV
 echo
-read -p "Do you want to deploy TF backend resources? Valid values 'true' OR 'false':" ENABLE_TF_BACKEND
+read -p "Deploy TF backend resources? 'true' OR 'false':" ENABLE_TF_BACKEND
 echo
 
 function terraform_backend_deployment() {
@@ -26,14 +26,14 @@ function terraform_backend_deployment() {
 
     terraform init
     terraform plan -var="default_region=$AWS_REGION"
-#    terraform apply -var="default_region=$AWS_REGION" -auto-approve
+    terraform apply -var="default_region=$AWS_REGION" -auto-approve
 
     cd ..
 
     echo ================================ IMPORTANT ===================================================
-    echo "Now update the Bucket Name & DynamoDB table from above TF outputs in the backend-config file for all \n
-    other modules which you want to deploy. Config file paths are 'deployment/vpc', 'deployment/vpc-endpoints', \n
-     'deployment/ec2-ecs-cluster'. After updating re-run this script with 'false' value for backend resources input!"
+    echo "Now update the Bucket Name & DynamoDB table from above TF outputs to the backend-config.
+    Backend config file paths are 'deployment/vpc', 'deployment/vpc-endpoints', 'deployment/ec2-ecs-cluster'.
+    After updating re-run this script with 'false' value for backend resources input!"
     echo ================================= ENDS =======================================================
     exit 1
 }
@@ -45,11 +45,12 @@ function s3_bucket_resources_deployment() {
     cd deployment/s3-buckets
 
     sed -i '/profile/s/^#//g' providers.tf
-    sed -i '/backend/,+4d' providers.tf
+#    sed -i '/backend/,+4d' providers.tf
+    sed -i "s/us-east-1/$AWS_REGION/g" providers.tf
 
     terraform init
     terraform plan -var-file="$ENV.tfvars" -var="default_region=$AWS_REGION"
-#    terraform apply -auto-approve
+    terraform apply -var-file="$ENV.tfvars" -var="default_region=$AWS_REGION" -auto-approve
 
     cd ../..
 }
@@ -71,12 +72,12 @@ function deploy_vpc_network() {
     cd deployment/vpc
 
     sed -i '/profile/s/^#//g' providers.tf
-    sed -i '/backend/,+4d' providers.tf
+#    sed -i '/backend/,+4d' providers.tf
     sed -i "s/us-east-1/$AWS_REGION/g" providers.tf
 
     terraform init
     terraform plan -var-file="$ENV.tfvars" -var="default_region=$AWS_REGION" -var="environment=$ENV"
-#    terraform apply -auto-approve
+    terraform apply -var-file="$ENV.tfvars" -var="default_region=$AWS_REGION" -var="environment=$ENV" -auto-approve
 
     cd ../..
 }
@@ -87,11 +88,12 @@ function deploy_vpc_endpoint_resources() {
     cd deployment/vpc-endpoints
 
     sed -i '/profile/s/^#//g' providers.tf
-    sed -i '/backend/,+4d' providers.tf
+#    sed -i '/backend/,+4d' providers.tf
+    sed -i "s/us-east-1/$AWS_REGION/g" providers.tf
 
     terraform init
     terraform plan -var-file="$ENV.tfvars" -var="default_region=$AWS_REGION" -var="environment=$ENV"
-#    terraform apply -auto-approve
+    terraform apply -var-file="$ENV.tfvars" -var="default_region=$AWS_REGION" -var="environment=$ENV" -auto-approve
 
     cd ../..
 }
@@ -113,11 +115,12 @@ function deploy_ecs_cluster_resources() {
     cd deployment/ec2-ecs-cluster
 
     sed -i '/profile/s/^#//g' providers.tf
-    sed -i '/backend/,+4d' providers.tf
+#    sed -i '/backend/,+4d' providers.tf
+    sed -i "s/us-east-1/$AWS_REGION/g" providers.tf
 
     terraform init
     terraform plan -var-file="$ENV.tfvars" -var="default_region=$AWS_REGION" -var="environment=$ENV"
-#    terraform apply -auto-approve
+    terraform apply -var-file="$ENV.tfvars" -var="default_region=$AWS_REGION" -var="environment=$ENV" -auto-approve
 
     cd ../..
 }
