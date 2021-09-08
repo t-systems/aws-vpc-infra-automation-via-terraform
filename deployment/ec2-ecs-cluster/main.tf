@@ -6,7 +6,6 @@ module "vpc-es-cluster" {
 
   environment    = var.environment
   default_region = var.default_region
-  tfstate_s3_bucket_prefix = var.tfstate_s3_bucket_prefix
 
   log_retention_days = var.log_retention_days
   instance_type      = var.instance_type
