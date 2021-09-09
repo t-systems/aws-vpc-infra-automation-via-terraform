@@ -5,8 +5,8 @@
   "builders": [
     {
       "type": "amazon-ebs",
-      "profile": "default",
-      "region": "{{user `region`}}",
+      "profile" : "{{user `aws_profile`}}",
+      "region" : "{{user `default_region`}}",
       "instance_type": "t3a.small",
       "source_ami_filter": {
         "filters": {
