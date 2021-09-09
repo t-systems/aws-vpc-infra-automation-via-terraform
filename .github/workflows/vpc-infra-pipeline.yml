@@ -14,7 +14,6 @@ on:
       env:
         required: true
         description: 'qa or test or prod'
-        default: 'test'
 
 env:
   tf_version: '0.13.5'
@@ -51,11 +50,12 @@ jobs:
           aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
 
       - name: Run aws cli to fetch Account Id
+        id: aws_details
         run: |
           ACCOUNT_ID=$(aws sts get-caller-identity --query "Account" --output text)
-          echo $ACCOUNT_ID
+          echo AWS_ACCOUNT=$ACCOUNT_ID >> $GITHUB_ENV
           CURRENT_REGION=$(aws ec2 describe-availability-zones --output text --query 'AvailabilityZones[0].[RegionName]')
-          echo $CURRENT_REGION
+          echo AWS_REGION=$CURRENT_REGION >> $GITHUB_ENV
 
       # Install the latest version of Terraform CLI and configure the Terraform CLI configuration file with a Terraform Cloud user API token
       - name: Setup Terraform
@@ -68,7 +68,7 @@ jobs:
           tf_actions_working_dir: ${{ env.tf_working_dir_app }}
           tf_actions_subcommand: 'init'
           tf_actions_comment: false
-          args: '-backend-config="backend-config-${{ env.environment }}.config -backend-config="bucket=${{ env.environment }}-tfstate-$ACCOUNT_ID-$CURRENT_REGION"'
+          args: '-backend-config="backend-config-${{ env.environment }}.config -backend-config="bucket=${{ env.environment }}-tfstate-${{ env.AWS_ACCOUNT }}-${{ env.AWS_REGION }}"'
 
 
       - name: 'Terraform Validate'
