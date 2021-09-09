@@ -16,12 +16,6 @@ variable "component_name" {
   description = "Component name for resources"
 }
 
-variable "tfstate_s3_bucket_prefix" {
-  type = string
-  description = "S3 name prefix of bucket where TF state files are stored"
-}
-
-
 #################################
 # ECS Variables                 #
 #################################
