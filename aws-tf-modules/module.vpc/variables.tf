@@ -27,17 +27,17 @@ variable "support_dns" {
 }
 
 variable "private_azs_with_cidr" {
-  type        = map(string)
+  type        = list(string)
   description = "Name of azs with cidr to be used for infrastructure"
 }
 
 variable "public_azs_with_cidr" {
-  type        = map(string)
+  type        = list(string)
   description = "Name of azs with cidr to be used for infrastructure"
 }
 
 variable "db_azs_with_cidr" {
-  type        = map(string)
+  type        = list(string)
   description = "Name of azs with cidr to be used for Database infrastructure"
 }
 
