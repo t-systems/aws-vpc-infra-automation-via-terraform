@@ -3,10 +3,10 @@ resource "aws_s3_bucket" "tf_state_backend_bucket" {
   bucket = "${var.environment}-tfstate-${data.aws_caller_identity.current.account_id}-${var.default_region}"
   acl    = "private"
 
-  force_destroy = false
+  force_destroy = true
 
   lifecycle {
-    prevent_destroy = "true"
+    prevent_destroy = false
   }
 
   server_side_encryption_configuration {
@@ -49,7 +49,7 @@ resource "aws_dynamodb_table" "dynamodb-terraform-state-lock" {
   }
 
   lifecycle {
-    prevent_destroy = true
+    prevent_destroy = false
   }
 
   tags = merge(local.common_tags, map("Name", "${var.environment}-tfstate-db"))
