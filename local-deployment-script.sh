@@ -1,23 +1,68 @@
 #!/usr/bin/env bash
 
 
+echo ============================== Reading AWS Default Profile ====================================
 aws configure list --profile default >/dev/null 2>&1
 EXIT_CODE=$?
 
 if [ $EXIT_CODE -eq 256 ]; then
-    echo "'default' aws profile is required!"
+    echo "'default' aws profile does not exit, please create!"
     exit 1
+else
+  echo "'default' aws profile exists!"
 fi
 
-read -p "Enter default region: " AWS_REGION
-echo
-read -p "Environment to deploy, valid values 'qa', 'test', 'prod': " ENV
-echo
-read -p "Deploy TF backend resources? 'true' OR 'false':" ENABLE_TF_BACKEND
-echo
+echo -e "\n\n =========================== Choose Terraform Execution Type ==========================="
+
+PS3="Choose the terraform execution type by inserting the number: "
+
+select EXEC_TYPE in apply destroy
+do
+    echo "You have decided to $EXEC_TYPE the AWS resources!"
+    break
+done
+
+
+echo -e "\n\n ============================= Choose AWS Region ======================================="
+
+PS3="Choose AWS region by inserting the number: "
+
+select AWS_REGION in us-east-1 us-east-2 eu-central-1 eu-west-1 eu-west-2 ap-south-1
+do
+    echo "You have selected $AWS_REGION to deploy the resources!"
+    break
+done
+
+
+echo -e "\n\n ======================= Choose Environment To Deploy =================================="
+
+PS3="Choose environment by inserting the number: "
+
+select ENV in qa test prod
+do
+    echo "You have selected $ENV environment for deployment"
+    break
+done
+
+
+echo -e "\n\n ======================= Enable Terraform Backend ======================================"
+
+PS3="Deploy TF backend resources (Required!). Valid input is only 'true': "
+
+select ENABLE_TF_BACKEND in true
+do
+    if [ $ENABLE_TF_BACKEND ]; then
+        echo "You decided to deploy Terraform backend resources!"
+    else
+      echo "You decided not to deploy Terraform backend resources!"
+    fi
+
+    break
+done
+
 
 function terraform_backend_deployment() {
-    echo ============================== Starting Terraform Backend Deployment =========================
+    echo -e "\n\n==================== Starting Terraform Backend Deployment ========================="
 
     cd aws-terraform-backend
 
@@ -26,7 +71,7 @@ function terraform_backend_deployment() {
 
     terraform init
     terraform plan -var="default_region=$AWS_REGION"
-    terraform apply -var="default_region=$AWS_REGION" -auto-approve
+    terraform apply -var="default_region=$AWS_REGION" -var="environment=$ENV" -auto-approve
 
     cd ..
 
@@ -40,15 +85,14 @@ function terraform_backend_deployment() {
 
 
 function s3_bucket_resources_deployment() {
-    echo ============================== Starting S3 Bucket Resource Deployment =========================
+    echo "\n\n===================== Starting S3 Bucket Resource Deployment ========================="
 
     cd deployment/s3-buckets
 
     sed -i '/profile/s/^#//g' providers.tf
-#    sed -i '/backend/,+4d' providers.tf
     sed -i "s/us-east-1/$AWS_REGION/g" providers.tf
 
-    terraform init
+    terraform init -backend-config="backend-config-$ENV.config"
     terraform plan -var-file="$ENV.tfvars" -var="default_region=$AWS_REGION"
     terraform apply -var-file="$ENV.tfvars" -var="default_region=$AWS_REGION" -auto-approve
 
@@ -57,25 +101,30 @@ function s3_bucket_resources_deployment() {
 
 
 function deploy_vpc_network() {
-    echo ============================== Creating Bastion host AMI using Packer =========================
-    echo "First we will create AMI named bastion-host-YYYY-MM-DD using packer as it is being used in Terraform script"
+    echo "\n\n ====================== Creating Bastion host AMI using Packer ========================="
+    echo "Checking whether AMI exists"
+    AMI_ID=$(aws ec2 describe-images --filters "Name=tag:Name,Values=Bastion-AMI" --query 'Images[*].ImageId' --region $AWS_REGION --profile default --output text)
 
-    cd packer/bastion
+    if [ -z $AMI_ID ]; then
+      echo "Creating AMI named bastion-host-YYYY-MM-DD using packer as it is being used in Terraform script"
 
-    packer validate bastion-template.json
-    packer build -var "aws_profile=default" -var "default_region=$AWS_REGION" bastion-template.json
+      cd packer/bastion
+      packer validate bastion-template.json
+      packer build -var "aws_profile=default" -var "default_region=$AWS_REGION" bastion-template.json
+      cd ../..
+    else
+      echo "AMI exits with id $AMI_ID, now creating VPC resources.."
+    fi
 
-    cd ../..
 
-    echo ========================= Starting vpc network deployment using TF ====================
+    echo "\n\n ========================= Starting vpc network deployment using TF ====================="
 
     cd deployment/vpc
 
     sed -i '/profile/s/^#//g' providers.tf
-#    sed -i '/backend/,+4d' providers.tf
     sed -i "s/us-east-1/$AWS_REGION/g" providers.tf
 
-    terraform init
+    terraform init -backend-config="backend-config-$ENV.config"
     terraform plan -var-file="$ENV.tfvars" -var="default_region=$AWS_REGION" -var="environment=$ENV"
     terraform apply -var-file="$ENV.tfvars" -var="default_region=$AWS_REGION" -var="environment=$ENV" -auto-approve
 
@@ -83,15 +132,14 @@ function deploy_vpc_network() {
 }
 
 function deploy_vpc_endpoint_resources() {
-    echo ============================== Starting VPC Endpoint Deployment =========================
+    echo "\n\n ============================== Starting VPC Endpoint Deployment ========================"
 
     cd deployment/vpc-endpoints
 
     sed -i '/profile/s/^#//g' providers.tf
-#    sed -i '/backend/,+4d' providers.tf
     sed -i "s/us-east-1/$AWS_REGION/g" providers.tf
 
-    terraform init
+    terraform init -backend-config="backend-config-$ENV.config"
     terraform plan -var-file="$ENV.tfvars" -var="default_region=$AWS_REGION" -var="environment=$ENV"
     terraform apply -var-file="$ENV.tfvars" -var="default_region=$AWS_REGION" -var="environment=$ENV" -auto-approve
 
@@ -100,25 +148,32 @@ function deploy_vpc_endpoint_resources() {
 
 
 function deploy_ecs_cluster_resources() {
-    echo ============================== Creating ECS AMI using Packer =========================
-    echo "First we will create AMI named ecs-ami-YYYY-MM-DD using packer as it is being used in Terraform script"
+    echo "\n\n ============================== Creating ECS AMI using Packer ==========================="
+    echo "Check whether AMI exists"
+    AMI_ID=$(aws ec2 describe-images --filters "Name=tag:Name,Values=ECS-AMI" --query 'Images[*].ImageId' --region $AWS_REGION --profile default --output text)
 
-    cd packer/ecs-ami
+    if [ -z $AMI_ID ]; then
+      echo "Creating AMI named ecs-ami-YYYY-MM-DD using packer as it is being used in Terraform script"
 
-    packer validate bastion-template.json
-    packer build -var "aws_profile=default" -var "default_region=$AWS_REGION" bastion-template.json
+      cd packer/ecs-ami
+      packer validate ecs-template.json
+      packer build -var "aws_profile=default" -var "default_region=$AWS_REGION" ecs-template.json
 
-    cd ../..
+      cd ../..
+    else
+      echo "AMI exits with id $AMI_ID, now creating VPC resources.."
+    fi
 
-    echo ============================== Starting ECS Cluster Deployment =========================
+
+
+    echo "\n\n ============================== Starting ECS Cluster Deployment ========================="
 
     cd deployment/ec2-ecs-cluster
 
     sed -i '/profile/s/^#//g' providers.tf
-#    sed -i '/backend/,+4d' providers.tf
     sed -i "s/us-east-1/$AWS_REGION/g" providers.tf
 
-    terraform init
+    terraform init -backend-config="backend-config-$ENV.config"
     terraform plan -var-file="$ENV.tfvars" -var="default_region=$AWS_REGION" -var="environment=$ENV"
     terraform apply -var-file="$ENV.tfvars" -var="default_region=$AWS_REGION" -var="environment=$ENV" -auto-approve
 
@@ -126,14 +181,43 @@ function deploy_ecs_cluster_resources() {
 }
 
 
+if [ $EXEC_TYPE == 'apply' ]; then
 
-if [ $ENABLE_TF_BACKEND == "true" ]; then
+  if [ $ENABLE_TF_BACKEND == 'true' ]; then
     terraform_backend_deployment
+  fi
+
+#    s3_bucket_resources_deployment
+#    deploy_vpc_network
+#    deploy_vpc_endpoint_resources
+#    deploy_ecs_cluster_resources
 fi
 
-s3_bucket_resources_deployment
-deploy_vpc_network
-deploy_vpc_endpoint_resources
-deploy_ecs_cluster_resources
 
+if [ $EXEC_TYPE == 'destroy' ]; then
+  echo "\n\n ============================ Destroying ECS Cluster Resources ========================="
+  cd deployment/ec2-ecs-cluster
+  terraform destroy -var-file="$ENV.tfvars" -var="default_region=$AWS_REGION" -var="environment=$ENV" -auto-approve
+  cd ../..
 
+  echo "\n\n =========================== Destroying VPC Endpoint Resources ========================="
+  cd deployment/vpc-endpoints
+  terraform destroy -var-file="$ENV.tfvars" -var="default_region=$AWS_REGION" -var="environment=$ENV" -auto-approve
+  cd ../..
+
+  echo "\n\n ========================== Destroying VPC Resources ==================================="
+  cd deployment/vpc
+  terraform destroy -var-file="$ENV.tfvars" -var="default_region=$AWS_REGION" -var="environment=$ENV" -auto-approve
+  cd ../..
+
+  echo "\n\n ========================= Destroying S3 Resources ====================================="
+  cd deployment/s3-buckets
+  terraform destroy -var-file="$ENV.tfvars" -var="default_region=$AWS_REGION" -var="environment=$ENV" -auto-approve
+  cd ../..
+
+  echo "\n\n ========================= Destroying Backend TF Resources ============================="
+  cd aws-terraform-backend
+  terraform destroy -var="default_region=$AWS_REGION" -var="environment=$ENV" -auto-approve
+  cd ..
+
+fi
