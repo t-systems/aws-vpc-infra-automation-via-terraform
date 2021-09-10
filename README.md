@@ -114,7 +114,7 @@ To run the terraform deployment from local we should have below installation in 
     - [VPC Endpoints Automation](.github/workflows/vpc-endpoints-pipeline.yml)
     - [EC2 ECS Cluster](.github/workflows/ec2-ecs-cluster-pipeline.yml)
 * Some useful terraform commands
-    - [Terraform commands](terraform-commands)
+    - [Terraform commands](terraform-aws-commands)
 
 
 <!-- CONTACT -->
