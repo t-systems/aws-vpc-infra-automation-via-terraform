@@ -54,7 +54,7 @@ jobs:
         run: |
           ACCOUNT_ID=$(aws sts get-caller-identity --query "Account" --output text)
           echo AWS_ACCOUNT=$ACCOUNT_ID >> $GITHUB_ENV
-          CURRENT_REGION=$(aws ec2 describe-availability-zones --output text --query 'AvailabilityZones[0].[RegionName]')
+          CURRENT_REGION=$(aws ec2 describe-availability-zones --query 'AvailabilityZones[0].[RegionName]' --output text)
           echo AWS_REGION=$CURRENT_REGION >> $GITHUB_ENV
 
       # Install the latest version of Terraform CLI and configure the Terraform CLI configuration file with a Terraform Cloud user API token
