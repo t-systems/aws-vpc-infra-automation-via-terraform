@@ -94,26 +94,19 @@ To run the terraform deployment from local we should have below installation in 
 
 ### Setup Configuration
 
-* Configure IAM credentials for AWS access.
-* Create bastion host AMI using packer. Change the region name as per the requirement.
-```
-    cd packer/bastion/
-    packer validate bastion-template.json    
-    packer build -var "aws_profile=<LOCAL_AWS_PROFILE_NAME>" -var "default_region=us-east-1" bastion-template.json
-
-    cd packer/ecs-ami/
-    packer validate ecs-template.json
-    packer build -var "aws_profile=<LOCAL_AWS_PROFILE_NAME>" -var "default_region=us-east-1" ecs-template.json
-```
+* Configure IAM credentials to access AWS environment.
+* To trigger the deployment of all the TF modules, please use below script.
+    - [Local Deployment Script](local-deployment-script.sh)
 * User can use below script to generate temporary credentials (Optional)
     - [Generate AWS Temporary Credentials](/assume-role-script.sh)
 * Terraform backend configuration using S3 & DynamoDB table (Optional)
     - [AWS Resources For TF Backend](aws-terraform-backend)
 * If you are using any CI tool **GitLab pipelines, GitHub Action, Jenkins** then configure the aws credentials accordingly. In this example I am using GitHub Actions to provision AWS resources. 
     - [VPC Infra Automation](.github/workflows/vpc-infra-pipeline.yml)
+    - [S3 Buckets](.github/workflows/s3-buckets-infra-pipeline.yml)
     - [VPC Endpoints Automation](.github/workflows/vpc-endpoints-pipeline.yml)
     - [EC2 ECS Cluster](.github/workflows/ec2-ecs-cluster-pipeline.yml)
-* Some useful terraform commands
+* Some useful terraform & aws commands
     - [Terraform commands](terraform-aws-commands)
 
 
