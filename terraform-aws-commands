@@ -1,3 +1,22 @@
+#####==================== Fetch AWS Account Id & Region =======================#####
+aws sts get-caller-identity --query "Account" --output text
+
+aws ec2 describe-availability-zones --query 'AvailabilityZones[0].[RegionName]' --output text
+
+
+===============================================================================================
+
+
+
+
+
+
+
+
+
+
+
+
 #####================Initialize Terraform with local tfstate=============#####
 terraform init
 
