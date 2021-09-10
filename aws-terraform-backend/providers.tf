@@ -1,11 +1,16 @@
 provider "aws" {
   region  = var.default_region
 #  profile = "default"
-
-  version = ">=2.22.0"
 }
 
 terraform {
+  required_providers {
+    aws = {
+      source = "hashicorp/aws"
+      version = ">=3.3.0"
+    }
+  }
+
   required_version = ">= 0.13"
 
   backend "s3" {

@@ -4,8 +4,6 @@
 provider "aws" {
   region = var.default_region
 #  profile = "default"
-
-  version = ">=2.28.0"
 }
 
 
