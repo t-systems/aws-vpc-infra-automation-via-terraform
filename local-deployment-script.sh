@@ -12,6 +12,18 @@ else
   echo "'default' aws profile exists!"
 fi
 
+
+echo -e "\n\n =========================== Fetch AWS Account Id ======================================"
+
+AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query "Account" --output text --profile default)
+if [ -z $AWS_ACCOUNT_ID  ]; then
+    echo "Credentials are not valid!"
+    exit 1
+else
+  echo $AWS_ACCOUNT_ID
+fi
+
+
 echo -e "\n\n =========================== Choose Terraform Execution Type ==========================="
 
 PS3="Choose the terraform execution type by inserting the number: "
@@ -47,12 +59,12 @@ done
 
 echo -e "\n\n ======================= Enable Terraform Backend ======================================"
 
-PS3="Deploy TF backend resources (Required!). Valid input is only 'true': "
+PS3="Deploy TF backend resources to store TF state file, valid input is '1': "
 
 select ENABLE_TF_BACKEND in true
 do
-    if [ $ENABLE_TF_BACKEND ]; then
-        echo "You decided to deploy Terraform backend resources!"
+    if [ $ENABLE_TF_BACKEND == true ]; then
+      echo "You decided to deploy Terraform backend resources!"
     else
       echo "You decided not to deploy Terraform backend resources!"
     fi
@@ -70,17 +82,12 @@ function terraform_backend_deployment() {
     sed -i '/backend/,+4d' providers.tf
 
     terraform init
-    terraform plan -var="default_region=$AWS_REGION"
-    terraform apply -var="default_region=$AWS_REGION" -var="environment=$ENV" -auto-approve
+    terraform plan -var-file="$ENV.tfvars" -var="default_region=$AWS_REGION"
+    terraform apply -var-file="$ENV.tfvars" -var="default_region=$AWS_REGION" -var="environment=$ENV" -auto-approve
 
     cd ..
 
-    echo ================================ IMPORTANT ===================================================
-    echo "Now update the Bucket Name & DynamoDB table from above TF outputs to the backend-config.
-    Backend config file paths are 'deployment/vpc', 'deployment/vpc-endpoints', 'deployment/ec2-ecs-cluster'.
-    After updating re-run this script with 'false' value for backend resources input!"
-    echo ================================= ENDS =======================================================
-    exit 1
+    echo -e "========================= Completed ================================================ \n\n"
 }
 
 
@@ -91,21 +98,26 @@ function s3_bucket_resources_deployment() {
 
     sed -i '/profile/s/^#//g' providers.tf
     sed -i "s/us-east-1/$AWS_REGION/g" providers.tf
+    sed -i "s/us-east-1/$AWS_REGION/g" config/$ENV-backend-config.config
 
-    terraform init -backend-config="backend-config-$ENV.config"
+    terraform init -backend-config="config/$ENV-backend-config.config" \
+    -backend-config="bucket=$ENV-tfstate-$AWS_ACCOUNT_ID-$AWS_REGION"
+
     terraform plan -var-file="$ENV.tfvars" -var="default_region=$AWS_REGION"
     terraform apply -var-file="$ENV.tfvars" -var="default_region=$AWS_REGION" -auto-approve
 
     cd ../..
+
+    echo -e "============================== Completed =============================================== \n\n"
 }
 
 
 function deploy_vpc_network() {
     echo "\n\n ====================== Creating Bastion host AMI using Packer ========================="
     echo "Checking whether AMI exists"
-    AMI_ID=$(aws ec2 describe-images --filters "Name=tag:Name,Values=Bastion-AMI" --query 'Images[*].ImageId' --region $AWS_REGION --profile default --output text)
+    BASTION_AMI_ID=$(aws ec2 describe-images --filters "Name=tag:Name,Values=Bastion-AMI" --query 'Images[*].ImageId' --region $AWS_REGION --profile default --output text)
 
-    if [ -z $AMI_ID ]; then
+    if [ -z $BASTION_AMI_ID ]; then
       echo "Creating AMI named bastion-host-YYYY-MM-DD using packer as it is being used in Terraform script"
 
       cd packer/bastion
@@ -113,7 +125,7 @@ function deploy_vpc_network() {
       packer build -var "aws_profile=default" -var "default_region=$AWS_REGION" bastion-template.json
       cd ../..
     else
-      echo "AMI exits with id $AMI_ID, now creating VPC resources.."
+      echo "AMI exits with id $BASTION_AMI_ID, now creating VPC resources.."
     fi
 
 
@@ -123,12 +135,17 @@ function deploy_vpc_network() {
 
     sed -i '/profile/s/^#//g' providers.tf
     sed -i "s/us-east-1/$AWS_REGION/g" providers.tf
+    sed -i "s/us-east-1/$AWS_REGION/g" config/$ENV-backend-config.config
 
-    terraform init -backend-config="backend-config-$ENV.config"
+    terraform init -backend-config="config/$ENV-backend-config.config" \
+    -backend-config="bucket=$ENV-tfstate-$AWS_ACCOUNT_ID-$AWS_REGION"
+
     terraform plan -var-file="$ENV.tfvars" -var="default_region=$AWS_REGION" -var="environment=$ENV"
     terraform apply -var-file="$ENV.tfvars" -var="default_region=$AWS_REGION" -var="environment=$ENV" -auto-approve
 
     cd ../..
+
+    echo -e "============================== Completed ================================================ \n\n"
 }
 
 function deploy_vpc_endpoint_resources() {
@@ -138,21 +155,26 @@ function deploy_vpc_endpoint_resources() {
 
     sed -i '/profile/s/^#//g' providers.tf
     sed -i "s/us-east-1/$AWS_REGION/g" providers.tf
+    sed -i "s/us-east-1/$AWS_REGION/g" config/$ENV-backend-config.config
 
-    terraform init -backend-config="backend-config-$ENV.config"
+    terraform init -backend-config="config/$ENV-backend-config.config" \
+    -backend-config="bucket=$ENV-tfstate-$AWS_ACCOUNT_ID-$AWS_REGION"
+
     terraform plan -var-file="$ENV.tfvars" -var="default_region=$AWS_REGION" -var="environment=$ENV"
     terraform apply -var-file="$ENV.tfvars" -var="default_region=$AWS_REGION" -var="environment=$ENV" -auto-approve
 
     cd ../..
+
+    echo -e "=============================== Completed ================================================\n\n"
 }
 
 
 function deploy_ecs_cluster_resources() {
     echo "\n\n ============================== Creating ECS AMI using Packer ==========================="
     echo "Check whether AMI exists"
-    AMI_ID=$(aws ec2 describe-images --filters "Name=tag:Name,Values=ECS-AMI" --query 'Images[*].ImageId' --region $AWS_REGION --profile default --output text)
+    ECS_AMI_ID=$(aws ec2 describe-images --filters "Name=tag:Name,Values=ECS-AMI" --query 'Images[*].ImageId' --region $AWS_REGION --profile default --output text)
 
-    if [ -z $AMI_ID ]; then
+    if [ -z $ECS_AMI_ID ]; then
       echo "Creating AMI named ecs-ami-YYYY-MM-DD using packer as it is being used in Terraform script"
 
       cd packer/ecs-ami
@@ -161,7 +183,7 @@ function deploy_ecs_cluster_resources() {
 
       cd ../..
     else
-      echo "AMI exits with id $AMI_ID, now creating VPC resources.."
+      echo "AMI exits with id $ECS_AMI_ID, now creating VPC resources.."
     fi
 
 
@@ -172,52 +194,99 @@ function deploy_ecs_cluster_resources() {
 
     sed -i '/profile/s/^#//g' providers.tf
     sed -i "s/us-east-1/$AWS_REGION/g" providers.tf
+    sed -i "s/us-east-1/$AWS_REGION/g" config/$ENV-backend-config.config
 
-    terraform init -backend-config="backend-config-$ENV.config"
+    terraform init -backend-config="config/$ENV-backend-config.config" \
+    -backend-config="bucket=$ENV-tfstate-$AWS_ACCOUNT_ID-$AWS_REGION"
+
     terraform plan -var-file="$ENV.tfvars" -var="default_region=$AWS_REGION" -var="environment=$ENV"
     terraform apply -var-file="$ENV.tfvars" -var="default_region=$AWS_REGION" -var="environment=$ENV" -auto-approve
 
     cd ../..
+
+    echo -e "============================== Completed =============================================\n\n"
 }
+
+
 
 
 if [ $EXEC_TYPE == 'apply' ]; then
 
-  if [ $ENABLE_TF_BACKEND == 'true' ]; then
     terraform_backend_deployment
-  fi
-
-#    s3_bucket_resources_deployment
-#    deploy_vpc_network
-#    deploy_vpc_endpoint_resources
-#    deploy_ecs_cluster_resources
+    s3_bucket_resources_deployment
+    deploy_vpc_network
+    deploy_vpc_endpoint_resources
+    deploy_ecs_cluster_resources
 fi
 
 
+
 if [ $EXEC_TYPE == 'destroy' ]; then
-  echo "\n\n ============================ Destroying ECS Cluster Resources ========================="
+  echo -e "\n\n ============================ Destroying ECS Cluster Resources ========================="
   cd deployment/ec2-ecs-cluster
   terraform destroy -var-file="$ENV.tfvars" -var="default_region=$AWS_REGION" -var="environment=$ENV" -auto-approve
   cd ../..
 
-  echo "\n\n =========================== Destroying VPC Endpoint Resources ========================="
+  echo -e "\n\n =========================== Destroying VPC Endpoint Resources ========================="
   cd deployment/vpc-endpoints
   terraform destroy -var-file="$ENV.tfvars" -var="default_region=$AWS_REGION" -var="environment=$ENV" -auto-approve
   cd ../..
 
-  echo "\n\n ========================== Destroying VPC Resources ==================================="
+  echo -e "\n\n ========================== Destroying VPC Resources ==================================="
   cd deployment/vpc
   terraform destroy -var-file="$ENV.tfvars" -var="default_region=$AWS_REGION" -var="environment=$ENV" -auto-approve
   cd ../..
 
-  echo "\n\n ========================= Destroying S3 Resources ====================================="
+  echo -e "\n\n ========================= Destroying S3 Resources ====================================="
   cd deployment/s3-buckets
   terraform destroy -var-file="$ENV.tfvars" -var="default_region=$AWS_REGION" -var="environment=$ENV" -auto-approve
   cd ../..
 
-  echo "\n\n ========================= Destroying Backend TF Resources ============================="
+  echo -e "\n\n ========================= Destroying Backend TF Resources =============================="
   cd aws-terraform-backend
-  terraform destroy -var="default_region=$AWS_REGION" -var="environment=$ENV" -auto-approve
+  terraform destroy -var-file="$ENV.tfvars" -var="default_region=$AWS_REGION" -var="environment=$ENV" -auto-approve
   cd ..
+  
+  
+  echo -e "\n\n ========================= =============================== =============================="
+  PS3="Do you want to deregister & delete Bastion & ECS AMI? Select by inserting the number: "
+
+  select AMI_DELETE_FLAG in Yes No
+  do
+      echo "Your input is $AMI_DELETE_FLAG, deleting AMIs..........."
+      break
+  done
+  
+  if [ $AMI_DELETE_FLAG=="true" ]; then
+
+      BASTION_AMI_ID=$(aws ec2 describe-images --filters "Name=tag:Name,Values=Bastion-AMI" --query 'Images[*].ImageId' --region $AWS_REGION --profile default --output text)
+
+      if [ -z $BASTION_AMI_ID ]; then
+          aws ec2 deregister-image --image-id $BASTION_AMI_ID --region $AWS_REGION
+
+          BASTION_SNAPSHOT=$(aws ec2 describe-snapshots --owner-ids self --filters Name=tag:Name,Values=Bastion-AMI --query "Snapshots[*].SnapshotId" --output text --region $AWS_REGION)
+          for ID in $BASTION_SNAPSHOT;
+          do
+            aws ec2 delete-snapshot --snapshot-id $ID --region $AWS_REGION
+          done
+      fi
+
+
+
+
+      ECS_AMI_ID=$(aws ec2 describe-images --filters "Name=tag:Name,Values=ECS-AMI" --query 'Images[*].ImageId' --region $AWS_REGION --profile default --output text)
+
+      if [ -z $ECS_AMI_ID ]; then
+        aws ec2 deregister-image --image-id $ECS_AMI_ID --region $AWS_REGION
+
+        ECS_SNAPSHOT=$(aws ec2 describe-snapshots --owner-ids self --filters Name=tag:Name,Values=ECS-AMI --query "Snapshots[*].SnapshotId" --output text --region $AWS_REGION)
+
+        for ID in $ECS_SNAPSHOT;
+        do
+          aws ec2 delete-snapshot --snapshot-id $ID --region $AWS_REGION
+        done
+      fi
+
+  fi
 
 fi
