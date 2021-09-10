@@ -49,6 +49,15 @@ jobs:
           aws-region: ${{ env.aws_region }}
           aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
 
+      - name: Run aws cli to fetch Account Id
+        id: aws_details
+        run: |
+          ACCOUNT_ID=$(aws sts get-caller-identity --query "Account" --output text)
+          echo AWS_ACCOUNT=$ACCOUNT_ID >> $GITHUB_ENV
+          CURRENT_REGION=$(aws ec2 describe-availability-zones --query 'AvailabilityZones[0].[RegionName]' --output text)
+          echo AWS_REGION=$CURRENT_REGION >> $GITHUB_ENV
+
+
       # Install the latest version of Terraform CLI and configure the Terraform CLI configuration file with a Terraform Cloud user API token
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
@@ -60,7 +69,7 @@ jobs:
           tf_actions_working_dir: ${{ env.tf_working_dir_app }}
           tf_actions_subcommand: 'init'
           tf_actions_comment: false
-          args: '-backend-config="backend-config-${{ env.environment }}.config'
+          args: '-backend-config="config/${{ env.environment }}-backend-config.config" -backend-config="bucket=${{ env.environment }}-tfstate-${{ env.AWS_ACCOUNT }}-${{ env.AWS_REGION }}"'
 
 
       - name: 'Terraform Validate'
