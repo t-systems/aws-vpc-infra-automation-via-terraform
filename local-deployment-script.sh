@@ -2,7 +2,7 @@
 
 
 echo ====================================== Info =======================================================
-echo "The below script will create terraform backend resources that is S3 bucket and DynamoDB table.
+echo "The below script will first create terraform backend resources that is S3 bucket and DynamoDB table.
 They will be used in other modules to store the TF state file"
 echo -e "===============================================================================================\n\n"
 
