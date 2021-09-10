@@ -7,23 +7,9 @@ support_dns        = "true"
 enable_nat_gateway = "true"
 
 
-private_azs_with_cidr = {
-  us-east-1a = "10.0.16.0/24"                 # 256 IPs
-  us-east-1b = "10.0.18.0/24"
-  us-east-1c = "10.0.20.0/24"
-}
-
-public_azs_with_cidr = {
-  us-east-1a = "10.0.17.0/24"
-  us-east-1b = "10.0.19.0/24"
-  us-east-1c = "10.0.21.0/24"
-}
-
-db_azs_with_cidr = {
-  us-east-1a = "10.0.22.0/24"
-  us-east-1b = "10.0.24.0/24"
-  us-east-1c = "10.0.26.0/24"
-}
+private_azs_with_cidr = ["10.0.16.0/24","10.0.18.0/24","10.0.20.0/24"]
+public_azs_with_cidr = ["10.0.17.0/24","10.0.19.0/24","10.0.21.0/24"]
+db_azs_with_cidr = ["10.0.22.0/24","10.0.24.0/24","10.0.26.0/24"]
 
 
 team                  = "LearningTeam"
