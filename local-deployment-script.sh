@@ -1,6 +1,12 @@
 #!/usr/bin/env bash
 
 
+echo ====================================== Info =======================================================
+echo "The below script will create terraform backend resources that is S3 bucket and DynamoDB table.
+They will be used in other modules to store the TF state file"
+echo -e "===============================================================================================\n\n"
+
+
 echo ============================== Reading AWS Default Profile ====================================
 aws configure list --profile default >/dev/null 2>&1
 EXIT_CODE=$?
@@ -9,7 +15,7 @@ if [ $EXIT_CODE -eq 256 ]; then
     echo "'default' aws profile does not exit, please create!"
     exit 1
 else
-  echo "'default' aws profile exists!"
+  echo "'default' aws profile exists! Let's provision some AWS resources."
 fi
 
 
@@ -53,22 +59,6 @@ PS3="Choose environment by inserting the number: "
 select ENV in qa test prod
 do
     echo "You have selected $ENV environment for deployment"
-    break
-done
-
-
-echo -e "\n\n ======================= Enable Terraform Backend ======================================"
-
-PS3="Deploy TF backend resources to store TF state file, valid input is '1': "
-
-select ENABLE_TF_BACKEND in true
-do
-    if [ $ENABLE_TF_BACKEND == true ]; then
-      echo "You decided to deploy Terraform backend resources!"
-    else
-      echo "You decided not to deploy Terraform backend resources!"
-    fi
-
     break
 done
 
@@ -268,6 +258,7 @@ if [ $EXEC_TYPE == 'destroy' ]; then
           for ID in $BASTION_SNAPSHOT;
           do
             aws ec2 delete-snapshot --snapshot-id $ID --region $AWS_REGION
+            echo ====================== Bastion Host AMI Delete Successfully =============================
           done
       fi
 
@@ -284,6 +275,7 @@ if [ $EXEC_TYPE == 'destroy' ]; then
         for ID in $ECS_SNAPSHOT;
         do
           aws ec2 delete-snapshot --snapshot-id $ID --region $AWS_REGION
+          echo ======================== ECS AMI Deleted Successfully ======================================
         done
       fi
 
