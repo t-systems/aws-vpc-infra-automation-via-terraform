@@ -32,7 +32,7 @@ fi
 
 echo -e "\n\n =========================== Choose Terraform Execution Type ==========================="
 
-PS3="Choose the terraform execution type by inserting the number: "
+PS3="Select the terraform execution type: "
 
 select EXEC_TYPE in apply destroy
 do
@@ -43,7 +43,7 @@ done
 
 echo -e "\n\n ============================= Choose AWS Region ======================================="
 
-PS3="Choose AWS region by inserting the number: "
+PS3="Select aws region to deploy the resources: "
 
 select AWS_REGION in us-east-1 us-east-2 eu-central-1 eu-west-1 eu-west-2 ap-south-1
 do
@@ -54,7 +54,7 @@ done
 
 echo -e "\n\n ======================= Choose Environment To Deploy =================================="
 
-PS3="Choose environment by inserting the number: "
+PS3="Select environment to deploy: "
 
 select ENV in qa test prod
 do
