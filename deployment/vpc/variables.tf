@@ -57,6 +57,11 @@ variable "public_key" {
   default     = ""
 }
 
+variable "ami_filter_type" {
+  type = string
+  description = "AMI filter type, valid values 'self', 'amazon'"
+}
+
 ######################################################
 # Local variables defined                            #
 ######################################################

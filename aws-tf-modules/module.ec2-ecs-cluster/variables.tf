@@ -94,6 +94,11 @@ variable "wait_for_capacity_timeout" {
   type        = string
 }
 
+variable "ami_filter_type" {
+  type = string
+  description = "AMI filter type, valid values 'self', 'amazon'"
+}
+
 
 ######################################################
 # Local variables defined                            #
