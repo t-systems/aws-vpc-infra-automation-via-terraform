@@ -18,7 +18,7 @@ resource "aws_vpc" "vpc" {
 resource "aws_internet_gateway" "vpc_igw" {
   vpc_id = aws_vpc.vpc.id
 
-  tags = merge(local.common_tags, tomap({"Name", "igw-${var.environment}"}))
+  tags = merge(local.common_tags, tomap({"Name"= "igw-${var.environment}"}))
 }
 
 ########################################################################
