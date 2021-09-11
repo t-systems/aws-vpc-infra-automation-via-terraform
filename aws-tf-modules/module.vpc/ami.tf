@@ -1,12 +1,21 @@
 ####################################################
 #             Bastion host AMI config              #
 ####################################################
-data "aws_ami" "bastion" {
-  owners      = ["self"]
+locals {
+  ami_filter_prefix = var.ami_filter_type == "self" ? "bastion-host-*" : "amzn2-ami-*-x86_64-gp2"
+}
+
+data "aws_ami" "ecs-node-ami" {
   most_recent = true
+  owners      = [var.ami_filter_type]
 
   filter {
     name   = "name"
-    values = ["bastion-host-*"]
+    values = [local.ami_filter_prefix]
+  }
+
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
   }
 }
