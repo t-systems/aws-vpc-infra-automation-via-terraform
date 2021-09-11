@@ -4,6 +4,12 @@ aws sts get-caller-identity --query "Account" --output text
 aws ec2 describe-availability-zones --query 'AvailabilityZones[0].[RegionName]' --output text
 
 
+aws --profile default ec2 describe-spot-price-history --start-time 2021-09-11T00:08:09 \
+--product-descriptions="Linux/UNIX (Amazon VPC)" --instance-types t3a.small \
+--output table --query "SpotPriceHistory[*].{az:AvailabilityZone, price:SpotPrice}" \
+--region eu-central-1
+
+
 ===============================================================================================
 
 
