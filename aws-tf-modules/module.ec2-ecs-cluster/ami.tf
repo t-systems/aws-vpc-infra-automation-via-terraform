@@ -2,7 +2,7 @@ locals {
   ami_filter_prefix = var.ami_filter_type == "self" ? "ecs-ami-*" : "*amazon-ecs-optimized"
 }
 
-data "aws_ami" "bastion" {
+data "aws_ami" "ecs-node-ami" {
   most_recent = true
   owners      = [var.ami_filter_type]
 
