@@ -1,10 +1,19 @@
-data "aws_ami" "ecs-node-ami" {
+locals {
+  ami_filter_prefix = var.ami_filter_type == "self" ? "ecs-ami-*" : "*amazon-ecs-optimized"
+}
+
+data "aws_ami" "bastion" {
   most_recent = true
-  owners      = ["self"]
+  owners      = [var.ami_filter_type]
 
   filter {
     name   = "name"
-    values = ["ecs-ami-*"]
+    values = [local.ami_filter_prefix]
+  }
+
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
   }
 }
 
