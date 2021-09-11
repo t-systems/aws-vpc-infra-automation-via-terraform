@@ -82,7 +82,7 @@ function terraform_backend_deployment() {
 
 
 function s3_bucket_resources_deployment() {
-    echo "\n\n===================== Starting S3 Bucket Resource Deployment ========================="
+    echo -e "\n\n===================== Starting S3 Bucket Resource Deployment ========================="
 
     cd deployment/s3-buckets
 
@@ -103,7 +103,7 @@ function s3_bucket_resources_deployment() {
 
 
 function deploy_vpc_network() {
-    echo "\n\n ====================== Creating Bastion host AMI using Packer ========================="
+    echo -e "\n\n ====================== Creating Bastion host AMI using Packer ========================="
     echo "Checking whether AMI exists"
     BASTION_AMI_ID=$(aws ec2 describe-images --filters "Name=tag:Name,Values=Bastion-AMI" --query 'Images[*].ImageId' --region $AWS_REGION --profile default --output text)
 
@@ -119,7 +119,7 @@ function deploy_vpc_network() {
     fi
 
 
-    echo "\n\n ========================= Starting vpc network deployment using TF ====================="
+    echo -e "\n\n ========================= Starting vpc network deployment using TF ====================="
 
     cd deployment/vpc
 
@@ -139,7 +139,7 @@ function deploy_vpc_network() {
 }
 
 function deploy_vpc_endpoint_resources() {
-    echo "\n\n ============================== Starting VPC Endpoint Deployment ========================"
+    echo -e "\n\n ============================== Starting VPC Endpoint Deployment ========================"
 
     cd deployment/vpc-endpoints
 
@@ -160,7 +160,7 @@ function deploy_vpc_endpoint_resources() {
 
 
 function deploy_ecs_cluster_resources() {
-    echo "\n\n ============================== Creating ECS AMI using Packer ==========================="
+    echo -e "\n\n ============================== Creating ECS AMI using Packer ==========================="
     echo "Check whether AMI exists"
     ECS_AMI_ID=$(aws ec2 describe-images --filters "Name=tag:Name,Values=ECS-AMI" --query 'Images[*].ImageId' --region $AWS_REGION --profile default --output text)
 
@@ -178,7 +178,7 @@ function deploy_ecs_cluster_resources() {
 
 
 
-    echo "\n\n ============================== Starting ECS Cluster Deployment ========================="
+    echo -e "\n\n ============================== Starting ECS Cluster Deployment ========================="
 
     cd deployment/ec2-ecs-cluster
 
