@@ -63,6 +63,24 @@ do
 done
 
 
+echo -e "\n\n ======================= Choose AMI Type To Create EC2 =================================="
+
+PS3="Select ami filter type: "
+
+AMI_FILTER_TYPE="amazon"
+
+select AMI_FILTER in self_owned amazon_owned
+do
+    echo "You have selected $AMI_FILTER ami filter type."
+
+    if [ $AMI_FILTER == 'self_owned' ]; then
+      AMI_FILTER_TYPE='self'
+    fi
+
+    break
+done
+
+
 function terraform_backend_deployment() {
     echo -e "\n\n==================== Starting Terraform Backend Deployment ========================="
 
@@ -71,7 +89,7 @@ function terraform_backend_deployment() {
     sed -i '/profile/s/^#//g' providers.tf
     sed -i '/backend/,+4d' providers.tf
 
-    terraform init
+    terraform init -reconfigure
     terraform plan -var-file="$ENV.tfvars" -var="default_region=$AWS_REGION"
     terraform apply -var-file="$ENV.tfvars" -var="default_region=$AWS_REGION" -var="environment=$ENV" -auto-approve
 
@@ -79,6 +97,7 @@ function terraform_backend_deployment() {
 
     echo -e "========================= Completed ================================================ \n\n"
 }
+
 
 
 function s3_bucket_resources_deployment() {
@@ -91,7 +110,7 @@ function s3_bucket_resources_deployment() {
     sed -i "s/us-east-1/$AWS_REGION/g" config/$ENV-backend-config.config
 
     terraform init -backend-config="config/$ENV-backend-config.config" \
-    -backend-config="bucket=$ENV-tfstate-$AWS_ACCOUNT_ID-$AWS_REGION"
+    -backend-config="bucket=$ENV-tfstate-$AWS_ACCOUNT_ID-$AWS_REGION" -reconfigure
 
     terraform plan -var-file="$ENV.tfvars" -var="default_region=$AWS_REGION"
     terraform apply -var-file="$ENV.tfvars" -var="default_region=$AWS_REGION" -auto-approve
@@ -103,6 +122,10 @@ function s3_bucket_resources_deployment() {
 
 
 function deploy_vpc_network() {
+
+  if [ $AMI_FILTER_TYPE == 'self' ]; then
+    echo -e "You have decided to create AMI for VPC bastion host."
+
     echo -e "\n\n ====================== Creating Bastion host AMI using Packer ========================="
     echo "Checking whether AMI exists"
     BASTION_AMI_ID=$(aws ec2 describe-images --filters "Name=tag:Name,Values=Bastion-AMI" --query 'Images[*].ImageId' --region $AWS_REGION --profile default --output text)
@@ -118,6 +141,8 @@ function deploy_vpc_network() {
       echo "AMI exits with id $BASTION_AMI_ID, now creating VPC resources.."
     fi
 
+  fi
+
 
     echo -e "\n\n ========================= Starting vpc network deployment using TF ====================="
 
@@ -128,15 +153,16 @@ function deploy_vpc_network() {
     sed -i "s/us-east-1/$AWS_REGION/g" config/$ENV-backend-config.config
 
     terraform init -backend-config="config/$ENV-backend-config.config" \
-    -backend-config="bucket=$ENV-tfstate-$AWS_ACCOUNT_ID-$AWS_REGION"
+    -backend-config="bucket=$ENV-tfstate-$AWS_ACCOUNT_ID-$AWS_REGION" -reconfigure
 
-    terraform plan -var-file="$ENV.tfvars" -var="default_region=$AWS_REGION" -var="environment=$ENV"
-    terraform apply -var-file="$ENV.tfvars" -var="default_region=$AWS_REGION" -var="environment=$ENV" -auto-approve
+    terraform plan -var-file="$ENV.tfvars" -var="default_region=$AWS_REGION" -var="environment=$ENV" -var="ami_filter_type=$AMI_FILTER_TYPE"
+    terraform apply -var-file="$ENV.tfvars" -var="default_region=$AWS_REGION" -var="environment=$ENV" -var="ami_filter_type=$AMI_FILTER_TYPE" -auto-approve
 
     cd ../..
 
     echo -e "============================== Completed ================================================ \n\n"
 }
+
 
 function deploy_vpc_endpoint_resources() {
     echo -e "\n\n ============================== Starting VPC Endpoint Deployment ========================"
@@ -148,7 +174,7 @@ function deploy_vpc_endpoint_resources() {
     sed -i "s/us-east-1/$AWS_REGION/g" config/$ENV-backend-config.config
 
     terraform init -backend-config="config/$ENV-backend-config.config" \
-    -backend-config="bucket=$ENV-tfstate-$AWS_ACCOUNT_ID-$AWS_REGION"
+    -backend-config="bucket=$ENV-tfstate-$AWS_ACCOUNT_ID-$AWS_REGION" -reconfigure
 
     terraform plan -var-file="$ENV.tfvars" -var="default_region=$AWS_REGION" -var="environment=$ENV"
     terraform apply -var-file="$ENV.tfvars" -var="default_region=$AWS_REGION" -var="environment=$ENV" -auto-approve
@@ -160,22 +186,27 @@ function deploy_vpc_endpoint_resources() {
 
 
 function deploy_ecs_cluster_resources() {
-    echo -e "\n\n ============================== Creating ECS AMI using Packer ==========================="
-    echo "Check whether AMI exists"
-    ECS_AMI_ID=$(aws ec2 describe-images --filters "Name=tag:Name,Values=ECS-AMI" --query 'Images[*].ImageId' --region $AWS_REGION --profile default --output text)
 
-    if [ -z $ECS_AMI_ID ]; then
-      echo "Creating AMI named ecs-ami-YYYY-MM-DD using packer as it is being used in Terraform script"
+    if [ $AMI_FILTER_TYPE == 'self' ]; then
+      echo -e "You have decided to create AMI for ECS Cluster."
 
-      cd packer/ecs-ami
-      packer validate ecs-template.json
-      packer build -var "aws_profile=default" -var "default_region=$AWS_REGION" ecs-template.json
+      echo -e "\n\n ============================== Creating ECS AMI using Packer ==========================="
+      echo "Check whether AMI exists"
+      ECS_AMI_ID=$(aws ec2 describe-images --filters "Name=tag:Name,Values=ECS-AMI" --query 'Images[*].ImageId' --region $AWS_REGION --profile default --output text)
 
-      cd ../..
-    else
-      echo "AMI exits with id $ECS_AMI_ID, now creating VPC resources.."
+      if [ -z $ECS_AMI_ID ]; then
+        echo "Creating AMI named ecs-ami-YYYY-MM-DD using packer as it is being used in Terraform script"
+
+        cd packer/ecs-ami
+        packer validate ecs-template.json
+        packer build -var "aws_profile=default" -var "default_region=$AWS_REGION" ecs-template.json
+
+        cd ../..
+      else
+        echo "AMI exits with id $ECS_AMI_ID, now creating VPC resources.."
+      fi
+
     fi
-
 
 
     echo -e "\n\n ============================== Starting ECS Cluster Deployment ========================="
@@ -187,10 +218,10 @@ function deploy_ecs_cluster_resources() {
     sed -i "s/us-east-1/$AWS_REGION/g" config/$ENV-backend-config.config
 
     terraform init -backend-config="config/$ENV-backend-config.config" \
-    -backend-config="bucket=$ENV-tfstate-$AWS_ACCOUNT_ID-$AWS_REGION"
+    -backend-config="bucket=$ENV-tfstate-$AWS_ACCOUNT_ID-$AWS_REGION" -reconfigure
 
-    terraform plan -var-file="$ENV.tfvars" -var="default_region=$AWS_REGION" -var="environment=$ENV"
-    terraform apply -var-file="$ENV.tfvars" -var="default_region=$AWS_REGION" -var="environment=$ENV" -auto-approve
+    terraform plan -var-file="$ENV.tfvars" -var="default_region=$AWS_REGION" -var="environment=$ENV" -var="ami_filter_type=$AMI_FILTER_TYPE"
+    terraform apply -var-file="$ENV.tfvars" -var="default_region=$AWS_REGION" -var="environment=$ENV" -var="ami_filter_type=$AMI_FILTER_TYPE" -auto-approve
 
     cd ../..
 
@@ -202,11 +233,44 @@ function deploy_ecs_cluster_resources() {
 
 if [ $EXEC_TYPE == 'apply' ]; then
 
-    terraform_backend_deployment
+  terraform_backend_deployment
+
+  PS3="Do you want to deploy S3 bucket module? It is going to create 3 S3 buckets, LOGGING, ARTIFACTORY & DATA LAKE: "
+  select ENABLE in Yes No
+  do
+    echo "You decision is $ENABLE to deploy S3 module!"
+    break
+  done
+
+  if [ $ENABLE == 'Yes' ]; then
     s3_bucket_resources_deployment
+  fi
+
+
+  PS3="Do you want to deploy VPC Resources & VPC Endpoints module? "
+  select ENABLE in Yes No
+  do
+    echo "You decision is $ENABLE to deploy VPC & Endpoints!"
+    break
+  done
+
+  if [ $ENABLE == 'Yes' ]; then
     deploy_vpc_network
     deploy_vpc_endpoint_resources
+  fi
+
+
+  PS3="Do you want to deploy EC2 ECS cluster module? "
+  select ENABLE in Yes No
+  do
+    echo "You decision is $ENABLE to deploy EC2 ECS cluster!"
+    break
+  done
+
+  if [ $ENABLE == 'Yes' ]; then
     deploy_ecs_cluster_resources
+  fi
+
 fi
 
 
@@ -214,7 +278,7 @@ fi
 if [ $EXEC_TYPE == 'destroy' ]; then
   echo -e "\n\n ============================ Destroying ECS Cluster Resources ========================="
   cd deployment/ec2-ecs-cluster
-  terraform destroy -var-file="$ENV.tfvars" -var="default_region=$AWS_REGION" -var="environment=$ENV" -auto-approve
+  terraform destroy -var-file="$ENV.tfvars" -var="default_region=$AWS_REGION" -var="environment=$ENV" -var="ami_filter_type=$AMI_FILTER_TYPE" -auto-approve
   cd ../..
 
   echo -e "\n\n =========================== Destroying VPC Endpoint Resources ========================="
@@ -224,7 +288,7 @@ if [ $EXEC_TYPE == 'destroy' ]; then
 
   echo -e "\n\n ========================== Destroying VPC Resources ==================================="
   cd deployment/vpc
-  terraform destroy -var-file="$ENV.tfvars" -var="default_region=$AWS_REGION" -var="environment=$ENV" -auto-approve
+  terraform destroy -var-file="$ENV.tfvars" -var="default_region=$AWS_REGION" -var="environment=$ENV" -var="ami_filter_type=$AMI_FILTER_TYPE" -auto-approve
   cd ../..
 
   echo -e "\n\n ========================= Destroying S3 Resources ====================================="
@@ -239,15 +303,15 @@ if [ $EXEC_TYPE == 'destroy' ]; then
   
   
   echo -e "\n\n ========================= =============================== =============================="
-  PS3="Do you want to deregister & delete Bastion & ECS AMI? Select by inserting the number: "
+  PS3="Do you want to deregister & delete Bastion & ECS AMI which we create using Packer? Select by inserting the number: "
 
   select AMI_DELETE_FLAG in Yes No
   do
-      echo "Your input is $AMI_DELETE_FLAG, deleting AMIs..........."
+      echo "Your input is $AMI_DELETE_FLAG"
       break
   done
   
-  if [ $AMI_DELETE_FLAG=="Yes" ]; then
+  if [ $AMI_DELETE_FLAG=='Yes' ] && [ $AMI_FILTER_TYPE=='self' ]; then
 
       BASTION_AMI_ID=$(aws ec2 describe-images --filters "Name=tag:Name,Values=Bastion-AMI" --query 'Images[*].ImageId' --region $AWS_REGION --profile default --output text)
 
@@ -261,7 +325,6 @@ if [ $EXEC_TYPE == 'destroy' ]; then
             echo ====================== Bastion Host AMI Delete Successfully =============================
           done
       fi
-
 
 
 
@@ -279,6 +342,8 @@ if [ $EXEC_TYPE == 'destroy' ]; then
         done
       fi
 
+  else
+    echo "No activity to perform!"
   fi
 
 fi
