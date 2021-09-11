@@ -12,7 +12,7 @@ resource "aws_security_group" "vpce" {
     cidr_blocks = [data.terraform_remote_state.vpc.outputs.vpc_cidr]
   }
 
-  tags = merge(local.common_tags, tomap("Name", "${var.environment}-vpce-sg"))
+  tags = merge(local.common_tags, tomap({"Name"= "${var.environment}-vpce-sg"}))
 }
 
 resource "aws_security_group" "ecs_task" {
@@ -33,7 +33,7 @@ resource "aws_security_group" "ecs_task" {
     protocol        = "tcp"
     prefix_list_ids = [aws_vpc_endpoint.s3_endpoint.prefix_list_id]
   }
-  tags = merge(local.common_tags, tomap("Name", "${var.environment}-ecs-task-sg"))
+  tags = merge(local.common_tags, tomap({"Name"= "${var.environment}-ecs-task-sg"}))
 }
 
 

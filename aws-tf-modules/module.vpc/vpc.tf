@@ -8,7 +8,7 @@ resource "aws_vpc" "vpc" {
   enable_dns_support   = var.support_dns
 
 
-  tags = merge(local.common_tags, tomap("Name", "vpc-${var.environment}-${var.cidr_block}"))
+  tags = merge(local.common_tags, tomap({"Name"= "vpc-${var.environment}-${var.cidr_block}"}))
 }
 
 #######################################################
@@ -18,7 +18,7 @@ resource "aws_vpc" "vpc" {
 resource "aws_internet_gateway" "vpc_igw" {
   vpc_id = aws_vpc.vpc.id
 
-  tags = merge(local.common_tags, tomap("Name", "igw-${var.environment}"))
+  tags = merge(local.common_tags, tomap({"Name", "igw-${var.environment}"}))
 }
 
 ########################################################################
@@ -31,7 +31,7 @@ resource "aws_internet_gateway" "vpc_igw" {
 ########################################################################
 resource "aws_route_table" "vpc_main_rt" {
   vpc_id = aws_vpc.vpc.id
-  tags   = merge(local.common_tags, tomap("Name", "vpc-${var.environment}-main-rt"))
+  tags   = merge(local.common_tags, tomap({"Name"= "vpc-${var.environment}-main-rt"}))
 }
 
 resource "aws_main_route_table_association" "main_rt_vpc" {

@@ -7,7 +7,7 @@ resource "aws_vpc_endpoint" "s3_endpoint" {
   vpc_endpoint_type = "Gateway"
   route_table_ids   = data.terraform_remote_state.vpc.outputs.private_rt
 
-  tags = merge(local.common_tags, tomap("Name", "${var.environment}-s3-endpoint"))
+  tags = merge(local.common_tags, tomap({"Name"= "${var.environment}-s3-endpoint"}))
 }
 
 #################################################
@@ -21,7 +21,7 @@ resource "aws_vpc_endpoint" "private_link_ecr_api" {
   security_group_ids  = [aws_security_group.vpce.id]
   subnet_ids          = data.terraform_remote_state.vpc.outputs.private_subnets
 
-  tags = merge(local.common_tags, tomap("Name", "${var.environment}-ecr-api-endpoint"))
+  tags = merge(local.common_tags, tomap({"Name"= "${var.environment}-ecr-api-endpoint"}))
 }
 
 resource "aws_vpc_endpoint" "private_link_ecr_dkr" {
@@ -32,7 +32,7 @@ resource "aws_vpc_endpoint" "private_link_ecr_dkr" {
   security_group_ids  = [aws_security_group.vpce.id]
   subnet_ids          = data.terraform_remote_state.vpc.outputs.private_subnets
 
-  tags = merge(local.common_tags, tomap("Name", "${var.environment}-dkr-endpoint"))
+  tags = merge(local.common_tags, tomap({"Name"= "${var.environment}-dkr-endpoint"}))
 }
 
 
@@ -47,7 +47,7 @@ resource "aws_vpc_endpoint" "private_link_ecs_agent" {
   security_group_ids  = [aws_security_group.vpce.id]
   subnet_ids          = data.terraform_remote_state.vpc.outputs.private_subnets
 
-  tags = merge(local.common_tags, tomap("Name", "${var.environment}-ecs-agent-endpoint"))
+  tags = merge(local.common_tags, tomap({"Name"= "${var.environment}-ecs-agent-endpoint"}))
 }
 
 resource "aws_vpc_endpoint" "private_link_ecs_telemetry" {
@@ -58,7 +58,7 @@ resource "aws_vpc_endpoint" "private_link_ecs_telemetry" {
   security_group_ids  = [aws_security_group.vpce.id]
   subnet_ids          = data.terraform_remote_state.vpc.outputs.private_subnets
 
-  tags = merge(local.common_tags, tomap("Name", "${var.environment}-ecs-telemetry-endpoint"))
+  tags = merge(local.common_tags, tomap({"Name" = "${var.environment}-ecs-telemetry-endpoint"}))
 }
 
 resource "aws_vpc_endpoint" "private_link_ecs" {
@@ -69,7 +69,7 @@ resource "aws_vpc_endpoint" "private_link_ecs" {
   security_group_ids  = [aws_security_group.vpce.id]
   subnet_ids          = data.terraform_remote_state.vpc.outputs.private_subnets
 
-  tags = merge(local.common_tags, tomap("Name", "${var.environment}-ecs-endpoint"))
+  tags = merge(local.common_tags, tomap({"Name"= "${var.environment}-ecs-endpoint"}))
 }
 
 #################################################
@@ -83,7 +83,7 @@ resource "aws_vpc_endpoint" "private_link_cw_logs" {
   security_group_ids  = [aws_security_group.vpce.id]
   subnet_ids          = data.terraform_remote_state.vpc.outputs.private_subnets
 
-  tags = merge(local.common_tags, tomap("Name", "${var.environment}-logs-endpoint"))
+  tags = merge(local.common_tags, tomap({"Name"= "${var.environment}-logs-endpoint"}))
 }
 
 
@@ -98,5 +98,5 @@ resource "aws_vpc_endpoint" "ec2" {
   subnet_ids          = data.terraform_remote_state.vpc.outputs.private_subnets
   security_group_ids  = [aws_security_group.vpce.id]
 
-  tags = merge(local.common_tags, tomap("Name", "${var.environment}-EC2-endpoint"))
+  tags = merge(local.common_tags, tomap({"Name" = "${var.environment}-EC2-endpoint"}))
 }

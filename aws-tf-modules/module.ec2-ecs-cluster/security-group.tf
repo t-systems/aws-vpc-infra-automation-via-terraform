@@ -9,7 +9,7 @@ resource "aws_security_group" "ecs_instance_sg" {
   lifecycle {
     create_before_destroy = true
   }
-  tags = merge(local.common_tags, tomap("Name", "ecs-node-sg"))
+  tags = merge(local.common_tags, tomap({"Name"= "ecs-node-sg"}))
 }
 
 resource "aws_security_group_rule" "allow_traffic_from_lb" {
@@ -51,7 +51,7 @@ resource "aws_security_group" "ecs_alb_sg" {
   lifecycle {
     create_before_destroy = true
   }
-  tags = merge(local.common_tags, tomap("Name", "ecs-cluster-alb-sg"))
+  tags = merge(local.common_tags, tomap({"Name"= "ecs-cluster-alb-sg"}))
 }
 
 resource "aws_security_group_rule" "allow_http_traffic" {

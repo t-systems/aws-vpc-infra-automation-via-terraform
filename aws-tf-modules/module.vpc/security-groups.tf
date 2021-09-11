@@ -35,5 +35,5 @@ resource "aws_security_group" "bastion_host_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  tags = merge(local.common_tags, tomap("Name", "${var.environment}-bastion-sg"))
+  tags = merge(local.common_tags, tomap({"Name"= "${var.environment}-bastion-sg"}))
 }

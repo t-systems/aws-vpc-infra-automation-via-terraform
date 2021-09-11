@@ -95,7 +95,7 @@ resource "aws_network_acl" "public_nacl" {
     to_port    = 65535
   }
 
-  tags = merge(local.common_tags, tomap("Name", "Public-${var.environment}-NACL"))
+  tags = merge(local.common_tags, tomap({"Name"= "Public-${var.environment}-NACL"}))
 }
 
 
@@ -197,5 +197,5 @@ resource "aws_network_acl" "private_nacl" {
     to_port    = 65535
   }
 
-  tags = merge(local.common_tags, tomap("Name", "Private-${var.environment}-NACL"))
+  tags = merge(local.common_tags, tomap({"Name"= "Private-${var.environment}-NACL"}))
 }

@@ -5,7 +5,7 @@ resource "aws_cloudwatch_log_group" "test_ecs_cluster_log_group" {
   name              = "${var.component_name}-${var.environment}-loggroup"
   retention_in_days = var.log_retention_days
 
-  tags = merge(local.common_tags, tomap("Name", "test-ecs-cluster-log-group"))
+  tags = merge(local.common_tags, tomap({"Name"= "test-ecs-cluster-log-group"}))
 }
 
 ###################################################
@@ -14,7 +14,7 @@ resource "aws_cloudwatch_log_group" "test_ecs_cluster_log_group" {
 resource "aws_ecs_cluster" "test_ecs_cluster" {
   name = "${var.component_name}-cluster-${var.environment}"
 
-  tags = merge(local.common_tags, tomap("Name", "test-ecs-cluster"))
+  tags = merge(local.common_tags, tomap({"Name"= "test-ecs-cluster"}))
 }
 
 
@@ -69,7 +69,7 @@ resource "aws_launch_template" "ecs_cluster_lt" {
   tag_specifications {
     resource_type = "instance"
 
-    tags = merge(local.common_tags, tomap("Project", "Learning-TF"))
+    tags = merge(local.common_tags, tomap({"Project"= "Learning-TF"}))
   }
 
   lifecycle {
