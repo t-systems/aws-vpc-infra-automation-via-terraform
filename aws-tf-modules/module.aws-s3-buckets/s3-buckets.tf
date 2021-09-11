@@ -64,5 +64,5 @@ resource "aws_s3_bucket" "s3_bucket" {
     }
   }
 
-  tags = merge(local.common_tags, map("Name", "${var.environment}-${each.value.bucket_prefix}-bucket"))
+  tags = merge(local.common_tags, tomap("Name", "${var.environment}-${each.value.bucket_prefix}-bucket"))
 }

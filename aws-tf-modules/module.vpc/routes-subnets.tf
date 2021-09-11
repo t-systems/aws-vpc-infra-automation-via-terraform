@@ -53,7 +53,7 @@ resource "aws_route_table" "private" {
 
   vpc_id = aws_vpc.vpc.id
 
-  tags = merge(local.common_tags, map("Name", "private-route-${var.environment}-${aws_vpc.vpc.id}-${count.index}"))
+  tags = merge(local.common_tags, tomap("Name", "private-route-${var.environment}-${aws_vpc.vpc.id}-${count.index}"))
 }
 
 resource "aws_route" "private_nat_gateway" {
@@ -84,7 +84,7 @@ resource "aws_route_table" "public" {
     gateway_id = aws_internet_gateway.vpc_igw.id
   }
 
-  tags = merge(local.common_tags, map("Name", "public-route-${var.environment}-${aws_vpc.vpc.id}"))
+  tags = merge(local.common_tags, tomap("Name", "public-route-${var.environment}-${aws_vpc.vpc.id}"))
 }
 
 resource "aws_route_table_association" "public_association" {
@@ -107,7 +107,7 @@ resource "aws_subnet" "public" {
   availability_zone       = local.list_of_azs[count.index]
   map_public_ip_on_launch = true
 
-  tags = merge(local.common_tags, map("Name", "publicSubnet-${var.environment}-${element(local.list_of_azs, count.index)}"))
+  tags = merge(local.common_tags, tomap("Name", "publicSubnet-${var.environment}-${element(local.list_of_azs, count.index)}"))
 }
 
 
@@ -123,7 +123,7 @@ resource "aws_subnet" "private" {
   availability_zone       = local.list_of_azs[count.index]
   map_public_ip_on_launch = false
 
-  tags = merge(local.common_tags, map("Name", "privateSubnet-${var.environment}-${element(local.list_of_azs, count.index)}"))
+  tags = merge(local.common_tags, tomap("Name", "privateSubnet-${var.environment}-${element(local.list_of_azs, count.index)}"))
 }
 
 
@@ -139,6 +139,6 @@ resource "aws_subnet" "db_subnets_private" {
   availability_zone       = local.list_of_azs[count.index]
   map_public_ip_on_launch = false
 
-  tags = merge(local.common_tags, map("Name", "db_subnet-${var.environment}-${element(local.list_of_azs, count.index)}"))
+  tags = merge(local.common_tags, tomap("Name", "db_subnet-${var.environment}-${element(local.list_of_azs, count.index)}"))
 }
 

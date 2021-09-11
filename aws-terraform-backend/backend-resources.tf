@@ -31,7 +31,7 @@ resource "aws_s3_bucket" "tf_state_backend_bucket" {
     }
   }
 
-  tags = merge(local.common_tags, map("Name", "${var.environment}-tfstate-bucket"))
+  tags = merge(local.common_tags, tomap("Name", "${var.environment}-tfstate-bucket"))
 }
 
 
@@ -52,5 +52,5 @@ resource "aws_dynamodb_table" "dynamodb-terraform-state-lock" {
     prevent_destroy = false
   }
 
-  tags = merge(local.common_tags, map("Name", "${var.environment}-tfstate-db"))
+  tags = merge(local.common_tags, tomap("Name", "${var.environment}-tfstate-db"))
 }
