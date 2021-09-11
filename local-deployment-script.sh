@@ -251,7 +251,7 @@ if [ $EXEC_TYPE == 'destroy' ]; then
 
       BASTION_AMI_ID=$(aws ec2 describe-images --filters "Name=tag:Name,Values=Bastion-AMI" --query 'Images[*].ImageId' --region $AWS_REGION --profile default --output text)
 
-      if [ -z $BASTION_AMI_ID ]; then
+      if [ ! -z $BASTION_AMI_ID ]; then
           aws ec2 deregister-image --image-id $BASTION_AMI_ID --region $AWS_REGION
 
           BASTION_SNAPSHOT=$(aws ec2 describe-snapshots --owner-ids self --filters Name=tag:Name,Values=Bastion-AMI --query "Snapshots[*].SnapshotId" --output text --region $AWS_REGION)
@@ -267,7 +267,7 @@ if [ $EXEC_TYPE == 'destroy' ]; then
 
       ECS_AMI_ID=$(aws ec2 describe-images --filters "Name=tag:Name,Values=ECS-AMI" --query 'Images[*].ImageId' --region $AWS_REGION --profile default --output text)
 
-      if [ -z $ECS_AMI_ID ]; then
+      if [ ! -z $ECS_AMI_ID ]; then
         aws ec2 deregister-image --image-id $ECS_AMI_ID --region $AWS_REGION
 
         ECS_SNAPSHOT=$(aws ec2 describe-snapshots --owner-ids self --filters Name=tag:Name,Values=ECS-AMI --query "Snapshots[*].SnapshotId" --output text --region $AWS_REGION)
