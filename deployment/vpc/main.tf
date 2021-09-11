@@ -22,4 +22,6 @@ module "vpc" {
   project      = var.project
 
   bastion_instance_type = var.bastion_instance_type
+
+  ami_filter_type = var.ami_filter_type
 }

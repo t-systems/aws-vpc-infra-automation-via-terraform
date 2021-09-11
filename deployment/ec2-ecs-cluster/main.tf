@@ -33,4 +33,6 @@ module "vpc-es-cluster" {
   owner = var.owner
   project = var.project
   team = var.team
+
+  ami_filter_type = var.ami_filter_type
 }
