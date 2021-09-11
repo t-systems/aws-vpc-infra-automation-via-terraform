@@ -247,7 +247,7 @@ if [ $EXEC_TYPE == 'destroy' ]; then
       break
   done
   
-  if [ $AMI_DELETE_FLAG=="true" ]; then
+  if [ $AMI_DELETE_FLAG=="Yes" ]; then
 
       BASTION_AMI_ID=$(aws ec2 describe-images --filters "Name=tag:Name,Values=Bastion-AMI" --query 'Images[*].ImageId' --region $AWS_REGION --profile default --output text)
 
