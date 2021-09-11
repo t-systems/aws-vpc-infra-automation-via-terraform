@@ -6,6 +6,7 @@ enable_dns         = "true"
 support_dns        = "true"
 enable_nat_gateway = "true"
 
+ami_filter_type = "self"
 
 private_azs_with_cidr = ["10.0.0.0/24","10.0.2.0/24","10.0.4.0/24"]
 public_azs_with_cidr = ["10.0.1.0/24","10.0.3.0/24","10.0.5.0/24"]
