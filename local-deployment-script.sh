@@ -63,9 +63,9 @@ do
 done
 
 
-echo -e "\n\n ======================= Choose AMI Type To Create EC2 =================================="
+echo -e "\n\n ======================= Choose AMI Filter Type To Create EC2 =================================="
 
-PS3="Select ami filter type: "
+PS3="Select ami filter type. Select 'self_owned' option, only if the default VPC is available within the AWS account: "
 
 AMI_FILTER_TYPE="amazon"
 
