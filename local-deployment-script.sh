@@ -278,26 +278,43 @@ fi
 if [ $EXEC_TYPE == 'destroy' ]; then
   echo -e "\n\n ============================ Destroying ECS Cluster Resources ========================="
   cd deployment/ec2-ecs-cluster
+
+  terraform init -backend-config="config/$ENV-backend-config.config" \
+  -backend-config="bucket=$ENV-tfstate-$AWS_ACCOUNT_ID-$AWS_REGION" -reconfigure
+
   terraform destroy -var-file="$ENV.tfvars" -var="default_region=$AWS_REGION" -var="environment=$ENV" -var="ami_filter_type=$AMI_FILTER_TYPE" -auto-approve
   cd ../..
 
   echo -e "\n\n =========================== Destroying VPC Endpoint Resources ========================="
   cd deployment/vpc-endpoints
+
+  terraform init -backend-config="config/$ENV-backend-config.config" \
+  -backend-config="bucket=$ENV-tfstate-$AWS_ACCOUNT_ID-$AWS_REGION" -reconfigure
+
   terraform destroy -var-file="$ENV.tfvars" -var="default_region=$AWS_REGION" -var="environment=$ENV" -auto-approve
   cd ../..
 
   echo -e "\n\n ========================== Destroying VPC Resources ==================================="
   cd deployment/vpc
+
+  terraform init -backend-config="config/$ENV-backend-config.config" \
+  -backend-config="bucket=$ENV-tfstate-$AWS_ACCOUNT_ID-$AWS_REGION" -reconfigure
+
   terraform destroy -var-file="$ENV.tfvars" -var="default_region=$AWS_REGION" -var="environment=$ENV" -var="ami_filter_type=$AMI_FILTER_TYPE" -auto-approve
   cd ../..
 
   echo -e "\n\n ========================= Destroying S3 Resources ====================================="
   cd deployment/s3-buckets
+
+  terraform init -backend-config="config/$ENV-backend-config.config" \
+  -backend-config="bucket=$ENV-tfstate-$AWS_ACCOUNT_ID-$AWS_REGION" -reconfigure
+
   terraform destroy -var-file="$ENV.tfvars" -var="default_region=$AWS_REGION" -var="environment=$ENV" -auto-approve
   cd ../..
 
   echo -e "\n\n ========================= Destroying Backend TF Resources =============================="
   cd aws-terraform-backend
+  terraform init -reconfigure
   terraform destroy -var-file="$ENV.tfvars" -var="default_region=$AWS_REGION" -var="environment=$ENV" -auto-approve
   cd ..
   
