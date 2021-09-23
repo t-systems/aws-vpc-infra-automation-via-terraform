@@ -312,11 +312,22 @@ if [ $EXEC_TYPE == 'destroy' ]; then
   terraform destroy -var-file="$ENV.tfvars" -var="default_region=$AWS_REGION" -var="environment=$ENV" -auto-approve
   cd ../..
 
-  echo -e "\n\n ========================= Destroying Backend TF Resources =============================="
-  cd aws-terraform-backend
-  terraform init -reconfigure
-  terraform destroy -var-file="$ENV.tfvars" -var="default_region=$AWS_REGION" -var="environment=$ENV" -auto-approve
-  cd ..
+
+  PS3="Do you want to destroy TF backend resources as well? "
+
+  select DESTROY_BACKEND in Yes No
+  do
+      echo "Your input is $DESTROY_BACKEND"
+      break
+  done
+
+  if [ $DESTROY_BACKEND == 'Yes' ]; then
+    echo -e "\n\n ========================= Destroying Backend TF Resources =============================="
+    cd aws-terraform-backend
+    terraform init -reconfigure
+    terraform destroy -var-file="$ENV.tfvars" -var="default_region=$AWS_REGION" -var="environment=$ENV" -auto-approve
+    cd ..
+  fi
   
   
   echo -e "\n\n ========================= =============================== =============================="
